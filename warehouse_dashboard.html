@@ -13,6 +13,8 @@
             --border:       #0a3070;
             --inbound:      #e1261c;
             --outbound:     #4a90d9;
+            --fg-in:        #22c55e;
+            --fg-out:       #a855f7;
             --success:      #22c55e;
             --warning:      #f59e0b;
             --danger:       #e1261c;
@@ -89,25 +91,25 @@
             background: var(--panel-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 14px 14px;
             margin-bottom: 14px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 14px;
         }
 
         .summary-col {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
 
         .summary-col-label {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 1px;
-            padding-bottom: 4px;
+            padding-bottom: 6px;
             border-bottom: 1.5px solid var(--border);
         }
 
@@ -118,6 +120,13 @@
             display: flex;
             justify-content: space-between;
             align-items: baseline;
+            padding: 1px 0;
+        }
+
+        .summary-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
         }
 
         .summary-val { font-size: 20px; font-weight: 900; line-height: 1; }
@@ -253,29 +262,38 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* log buttons */
-        .btn-log-inbound {
-            background: var(--inbound); color: #000;
-            font-weight: 900; width: 100%; padding: 11px;
-            border: none; border-radius: 8px; cursor: pointer;
+        /* log buttons — unified class for consistent spacing */
+        .btn-log {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
             font-family: 'Barlow Condensed', sans-serif;
-            font-size: 14px; font-weight: 700; text-transform: uppercase;
-            margin-bottom: 8px; transition: opacity 0.15s;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            transition: opacity 0.15s;
+            display: block;
         }
 
-        .btn-log-outbound {
-            background: var(--outbound); color: #fff;
-            font-weight: 900; width: 100%; padding: 11px;
-            border: none; border-radius: 8px; cursor: pointer;
-            font-family: 'Barlow Condensed', sans-serif;
-            font-size: 14px; font-weight: 700; text-transform: uppercase;
-            margin-bottom: 0; transition: opacity 0.15s;
+        .btn-log:last-child { margin-bottom: 0; }
+        .btn-log:hover { opacity: 0.85; }
+
+        .btn-log-inbound  { background: var(--inbound);  color: #fff; }
+        .btn-log-outbound { background: var(--outbound); color: #fff; }
+        .btn-log-fg-in    { background: var(--fg-in);    color: #000; }
+        .btn-log-fg-out   { background: var(--fg-out);   color: #fff; }
+        .btn-log-analytics {
+            background: var(--panel-bg);
+            border: 1.5px solid var(--border);
+            color: var(--text);
         }
+        .btn-log-analytics:hover { background: var(--border); opacity: 1; }
 
-        .btn-log-inbound:hover,
-        .btn-log-outbound:hover { opacity: 0.85; }
-
-        .log-btn-group { margin-top: auto; padding-top: 10px; }
+        .log-btn-group { margin-top: auto; padding-top: 10px; display: flex; flex-direction: column; gap: 0; }
 
         /* ── TOGGLE BUTTON ───────────────────────────────────── */
         #toggle-btn {
@@ -445,6 +463,28 @@
 
         .card-accent.inbound  { background: var(--inbound); }
         .card-accent.outbound { background: var(--outbound); }
+        .card-accent.fg-in    { background: var(--fg-in); }
+        .card-accent.fg-out   { background: var(--fg-out); }
+
+        .card-type-label.inbound  { color: var(--inbound); }
+        .card-type-label.outbound { color: var(--outbound); }
+        .card-type-label.fg-in    { color: var(--fg-in); }
+        .card-type-label.fg-out   { color: var(--fg-out); }
+
+        .stat-val.fg-in  { color: var(--fg-in); }
+        .stat-val.fg-out { color: var(--fg-out); }
+        .summary-val.fg-in  { color: var(--fg-in); }
+        .summary-val.fg-out { color: var(--fg-out); }
+        .section-title.fg-in  { color: var(--fg-in); }
+        .section-title.fg-out { color: var(--fg-out); }
+        .section-line.fg-in  { background: var(--fg-in);  opacity: 0.3; }
+        .section-line.fg-out { background: var(--fg-out); opacity: 0.3; }
+        .stat-pill.fg-in  { background: rgba(34,197,94,0.12); }
+        .stat-pill.fg-out { background: rgba(168,85,247,0.12); }
+        .warning-red.fg-in  { box-shadow: 0 0 28px rgba(34,197,94,0.5); }
+        .warning-red.fg-out { box-shadow: 0 0 28px rgba(168,85,247,0.5); }
+        .mode-btn.active-fg-in  { background: var(--fg-in);  color: #000; }
+        .mode-btn.active-fg-out { background: var(--fg-out); color: #fff; }
 
         .card-body { padding: 20px 22px 18px; }
 
@@ -830,79 +870,67 @@
 
         <div class="brand">
             <div class="brand-icon">▶</div>
-            <h1>CEVA Logistics<br><span style="font-size:14px;font-weight:600;letter-spacing:3px;opacity:0.9;">Warehouse Dashboard</span></h1>
+            <h1>CEVA<br><span style="font-size:14px;font-weight:600;letter-spacing:3px;opacity:0.9;">WAREHOUSE OPS</span></h1>
         </div>
         <div id="syncStatus">INITIALIZING...</div>
 
         <!-- Shift Summary -->
-        <div id="shift-summary">
+        <div id="shift-summary" style="grid-template-columns:1fr 1fr 1fr 1fr;">
             <div class="summary-col">
-                <div class="summary-col-label inbound">▼ Inbound</div>
-                <div class="summary-row">
-                    <span class="summary-lbl">Active</span>
-                    <span class="summary-val inbound" id="in-active">0</span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-lbl">Closed</span>
-                    <span class="summary-val inbound" id="in-closed">0</span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-lbl">Avg</span>
-                    <span class="summary-val inbound" id="in-avg">—</span>
-                </div>
-                <div class="summary-row" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);">
-                    <span class="summary-lbl" style="color:var(--muted);">Today Closed</span>
-                    <span class="summary-val inbound" id="in-closed-today">0</span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-lbl" style="color:var(--muted);">Today Avg</span>
-                    <span class="summary-val inbound" id="in-avg-today">—</span>
-                </div>
+                <div class="summary-col-label inbound">PI Receipts</div>
+                <div class="summary-row"><span class="summary-lbl">Active</span><span class="summary-val inbound" id="in-active">0</span></div>
+                <div class="summary-row"><span class="summary-lbl">Closed</span><span class="summary-val inbound" id="in-closed">0</span></div>
+                <div class="summary-row"><span class="summary-lbl">Avg</span><span class="summary-val inbound" id="in-avg">—</span></div>
+                <div class="summary-divider"></div>
+                <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Today Closed</span><span class="summary-val inbound" id="in-closed-today">0</span></div>
+                <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Today Avg</span><span class="summary-val inbound" id="in-avg-today">—</span></div>
             </div>
             <div class="summary-col">
-                <div class="summary-col-label outbound">▲ Outbound</div>
-                <div class="summary-row">
-                    <span class="summary-lbl">Active</span>
-                    <span class="summary-val outbound" id="out-active">0</span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-lbl">Closed</span>
-                    <span class="summary-val outbound" id="out-closed">0</span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-lbl">Auto Avg</span>
-                    <span class="summary-val outbound" id="out-avg">—</span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-lbl">Manual Avg</span>
-                    <span class="summary-val outbound" id="out-avg-manual">—</span>
-                </div>
-                <div class="summary-row" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);">
-                    <span class="summary-lbl" style="color:var(--muted);">Today Closed</span>
-                    <span class="summary-val outbound" id="out-closed-today">0</span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-lbl" style="color:var(--muted);">Auto Avg</span>
-                    <span class="summary-val outbound" id="out-avg-auto-today">—</span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-lbl" style="color:var(--muted);">Manual Avg</span>
-                    <span class="summary-val outbound" id="out-avg-manual-today">—</span>
-                </div>
+                <div class="summary-col-label outbound">PI Pulls</div>
+                <div class="summary-row"><span class="summary-lbl">Active</span><span class="summary-val outbound" id="out-active">0</span></div>
+                <div class="summary-row"><span class="summary-lbl">Closed</span><span class="summary-val outbound" id="out-closed">0</span></div>
+                <div class="summary-row"><span class="summary-lbl">Auto Avg</span><span class="summary-val outbound" id="out-avg">—</span></div>
+                <div class="summary-row"><span class="summary-lbl">Man Avg</span><span class="summary-val outbound" id="out-avg-manual">—</span></div>
+                <div class="summary-divider"></div>
+                <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Today Closed</span><span class="summary-val outbound" id="out-closed-today">0</span></div>
+                <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Auto Avg</span><span class="summary-val outbound" id="out-avg-auto-today">—</span></div>
+                <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Man Avg</span><span class="summary-val outbound" id="out-avg-manual-today">—</span></div>
+            </div>
+            <div class="summary-col">
+                <div class="summary-col-label" style="color:var(--fg-in);">FG Receipts</div>
+                <div class="summary-row"><span class="summary-lbl">Active</span><span class="summary-val fg-in" id="fgin-active">0</span></div>
+                <div class="summary-row"><span class="summary-lbl">Closed</span><span class="summary-val fg-in" id="fgin-closed">0</span></div>
+                <div class="summary-row"><span class="summary-lbl">Avg</span><span class="summary-val fg-in" id="fgin-avg">—</span></div>
+                <div class="summary-divider"></div>
+                <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Today Closed</span><span class="summary-val fg-in" id="fgin-closed-today">0</span></div>
+                <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Today Avg</span><span class="summary-val fg-in" id="fgin-avg-today">—</span></div>
+            </div>
+            <div class="summary-col">
+                <div class="summary-col-label" style="color:var(--fg-out);">FG Pulls</div>
+                <div class="summary-row"><span class="summary-lbl">Active</span><span class="summary-val fg-out" id="fgout-active">0</span></div>
+                <div class="summary-row"><span class="summary-lbl">Closed</span><span class="summary-val fg-out" id="fgout-closed">0</span></div>
+                <div class="summary-row"><span class="summary-lbl">Auto Avg</span><span class="summary-val fg-out" id="fgout-avg">—</span></div>
+                <div class="summary-row"><span class="summary-lbl">Man Avg</span><span class="summary-val fg-out" id="fgout-avg-manual">—</span></div>
+                <div class="summary-divider"></div>
+                <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Today Closed</span><span class="summary-val fg-out" id="fgout-closed-today">0</span></div>
+                <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Auto Avg</span><span class="summary-val fg-out" id="fgout-avg-auto-today">—</span></div>
+                <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Man Avg</span><span class="summary-val fg-out" id="fgout-avg-manual-today">—</span></div>
             </div>
         </div>
 
-        <!-- Mode toggle -->
-        <div class="mode-toggle">
-            <button class="mode-btn active-inbound" id="mode-inbound" onclick="setMode('inbound')">▼ Inbound Receipt</button>
-            <button class="mode-btn" id="mode-outbound" onclick="setMode('outbound')">▲ Outbound Pull</button>
+        <!-- Mode toggle — 2x2 grid for four modes -->
+        <div class="mode-toggle" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;">
+            <button class="mode-btn active-inbound" id="mode-pi-rec"  onclick="setMode('pi-rec')">PI Receipt</button>
+            <button class="mode-btn" id="mode-pi-pull" onclick="setMode('pi-pull')">PI Pull</button>
+            <button class="mode-btn" id="mode-fg-rec"  onclick="setMode('fg-rec')">FG Receipt</button>
+            <button class="mode-btn" id="mode-fg-pull" onclick="setMode('fg-pull')">FG Pull</button>
         </div>
 
         <!-- Control panel -->
         <div class="control-panel">
 
-            <!-- INBOUND fields -->
-            <div class="panel-mode active" id="inbound-panel">
+            <!-- PI RECEIPT fields -->
+            <div class="panel-mode active" id="pi-rec-panel">
                 <label>Dock Door</label>
                 <input type="text" id="in-door" placeholder="Ex: D101" autocomplete="off">
                 <label>Trailer #</label>
@@ -919,13 +947,11 @@
                     <button class="btn btn-start-inbound" onclick="startRec()">▶ Start</button>
                     <button class="btn btn-close-rec" onclick="initiateCloseRec()">■ Close</button>
                 </div>
-                <div class="saving-indicator" id="in-saving">
-                    <div class="spinner"></div><span>Saving...</span>
-                </div>
+                <div class="saving-indicator" id="in-saving"><div class="spinner"></div><span>Saving...</span></div>
             </div>
 
-            <!-- OUTBOUND fields -->
-            <div class="panel-mode" id="outbound-panel">
+            <!-- PI PULL fields -->
+            <div class="panel-mode" id="pi-pull-panel">
                 <label>Pull ID</label>
                 <input type="text" id="out-id" placeholder="Ex: 123" autocomplete="off">
                 <label>Total Pull Quantity</label>
@@ -939,18 +965,50 @@
                     <button class="btn btn-start-outbound" onclick="startWave()">▶ Start</button>
                     <button class="btn btn-close-wave" onclick="initiateCloseWave()">■ Close</button>
                 </div>
-                <div class="saving-indicator" id="out-saving">
-                    <div class="spinner outbound"></div><span>Saving...</span>
+                <div class="saving-indicator" id="out-saving"><div class="spinner outbound"></div><span>Saving...</span></div>
+            </div>
+
+            <!-- FG RECEIPT fields -->
+            <div class="panel-mode" id="fg-rec-panel">
+                <label>Incoming PO / DN</label>
+                <input type="text" id="fgin-po" placeholder="Ex: PO-12345" autocomplete="off">
+                <label>Quantity</label>
+                <input type="number" id="fgin-qty" placeholder="0" autocomplete="off"
+                       onkeydown="if(event.key==='Enter') startFgRec()">
+                <div class="btn-row">
+                    <button class="btn" style="background:var(--fg-in);color:#000;" onclick="startFgRec()">▶ Start</button>
+                    <button class="btn btn-close-rec" onclick="initiateCloseFgRec()">■ Close</button>
                 </div>
+                <div class="saving-indicator" id="fgin-saving"><div class="spinner" style="border-top-color:var(--fg-in);"></div><span>Saving...</span></div>
+            </div>
+
+            <!-- FG PULL fields -->
+            <div class="panel-mode" id="fg-pull-panel">
+                <label>Pull ID</label>
+                <input type="text" id="fgout-id" placeholder="Ex: 123" autocomplete="off">
+                <label>Quantity</label>
+                <input type="number" id="fgout-qty" placeholder="0" autocomplete="off">
+                <label>Pull Type</label>
+                <select id="fgout-type">
+                    <option value="manual">Manual (1 Hour SLA)</option>
+                    <option value="auto">Auto (5 Hour SLA)</option>
+                </select>
+                <div class="btn-row">
+                    <button class="btn" style="background:var(--fg-out);color:#fff;" onclick="startFgPull()">▶ Start</button>
+                    <button class="btn btn-close-wave" onclick="initiateCloseFgPull()">■ Close</button>
+                </div>
+                <div class="saving-indicator" id="fgout-saving"><div class="spinner" style="border-top-color:var(--fg-out);"></div><span>Saving...</span></div>
             </div>
 
         </div>
 
         <!-- Log buttons -->
         <div class="log-btn-group">
-            <button class="btn-log-inbound"  onclick="toggleLog('inbound')">📋 Inbound History</button>
-            <button class="btn-log-outbound" onclick="toggleLog('outbound')">📋 Outbound History</button>
-            <button onclick="toggleAnalytics()" style="background:var(--panel-bg);border:1.5px solid var(--border);color:var(--text);font-weight:900;width:100%;padding:11px;border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:0.5px;margin-top:8px;transition:background 0.15s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--panel-bg)'">📊 Analytics</button>
+            <button class="btn-log btn-log-inbound"   onclick="toggleLog('inbound')">📋 PI Receipt History</button>
+            <button class="btn-log btn-log-outbound"  onclick="toggleLog('outbound')">📋 PI Pull History</button>
+            <button class="btn-log btn-log-fg-in"     onclick="toggleLog('fg-rec')">📋 FG Receipt History</button>
+            <button class="btn-log btn-log-fg-out"    onclick="toggleLog('fg-pull')">📋 FG Pull History</button>
+            <button class="btn-log btn-log-analytics" onclick="toggleAnalytics()">📊 Analytics</button>
         </div>
 
     </div>
@@ -961,84 +1019,92 @@
 
     <button id="toggle-btn" onclick="toggleSidebar()" title="Toggle Panel">☰</button>
 
-    <!-- Inbound section -->
+    <!-- 1. PI Receipts -->
     <div class="section-header">
-        <span class="section-title inbound">▼ Inbound Receipts</span>
+        <span class="section-title inbound">▼ PI Receipts</span>
         <div class="section-stats">
-            <div class="stat-pill inbound">
-                <span class="stat-val inbound" id="sec-in-active">0</span>
-                <span class="stat-lbl">Active</span>
-            </div>
+            <div class="stat-pill inbound"><span class="stat-val inbound" id="sec-in-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
-            <div class="stat-pill inbound">
-                <span class="stat-val inbound" id="sec-in-closed">0</span>
-                <span class="stat-lbl">Closed</span>
-            </div>
+            <div class="stat-pill inbound"><span class="stat-val inbound" id="sec-in-closed">0</span><span class="stat-lbl">Closed</span></div>
             <div class="stat-sep"></div>
-            <div class="stat-pill inbound">
-                <span class="stat-val inbound" id="sec-in-avg">—</span>
-                <span class="stat-lbl">Avg</span>
-            </div>
+            <div class="stat-pill inbound"><span class="stat-val inbound" id="sec-in-avg">—</span><span class="stat-lbl">Avg</span></div>
             <div class="stat-sep" style="background:rgba(225,38,28,0.2);"></div>
-            <div class="stat-pill inbound" style="background:rgba(225,38,28,0.06);outline:1px solid rgba(225,38,28,0.2);outline-offset:-1px;">
-                <span class="stat-val inbound" id="sec-in-closed-today">0</span>
-                <span class="stat-lbl">Today Closed</span>
-            </div>
+            <div class="stat-pill inbound" style="background:rgba(225,38,28,0.06);outline:1px solid rgba(225,38,28,0.2);outline-offset:-1px;"><span class="stat-val inbound" id="sec-in-closed-today">0</span><span class="stat-lbl">Today Closed</span></div>
             <div class="stat-sep"></div>
-            <div class="stat-pill inbound" style="background:rgba(225,38,28,0.06);outline:1px solid rgba(225,38,28,0.2);outline-offset:-1px;">
-                <span class="stat-val inbound" id="sec-in-avg-today">—</span>
-                <span class="stat-lbl">Today Avg</span>
-            </div>
+            <div class="stat-pill inbound" style="background:rgba(225,38,28,0.06);outline:1px solid rgba(225,38,28,0.2);outline-offset:-1px;"><span class="stat-val inbound" id="sec-in-avg-today">—</span><span class="stat-lbl">Today Avg</span></div>
         </div>
         <div class="section-line inbound"></div>
     </div>
     <div class="section-grid" id="grid-inbound">
-        <div class="section-empty" id="empty-inbound">No active inbound receipts</div>
+        <div class="section-empty" id="empty-inbound">No active PI receipts</div>
     </div>
 
-    <!-- Outbound section -->
+    <!-- 2. PI Pulls -->
     <div class="section-header">
-        <span class="section-title outbound">▲ Outbound Pulls</span>
+        <span class="section-title outbound">▲ PI Pulls</span>
         <div class="section-stats">
-            <div class="stat-pill outbound">
-                <span class="stat-val outbound" id="sec-out-active">0</span>
-                <span class="stat-lbl">Active</span>
-            </div>
+            <div class="stat-pill outbound"><span class="stat-val outbound" id="sec-out-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
-            <div class="stat-pill outbound">
-                <span class="stat-val outbound" id="sec-out-closed">0</span>
-                <span class="stat-lbl">Closed</span>
-            </div>
+            <div class="stat-pill outbound"><span class="stat-val outbound" id="sec-out-closed">0</span><span class="stat-lbl">Closed</span></div>
             <div class="stat-sep"></div>
-            <div class="stat-pill outbound">
-                <span class="stat-val outbound" id="sec-out-avg-auto">—</span>
-                <span class="stat-lbl">Auto Avg</span>
-            </div>
+            <div class="stat-pill outbound"><span class="stat-val outbound" id="sec-out-avg-auto">—</span><span class="stat-lbl">Auto Avg</span></div>
             <div class="stat-sep"></div>
-            <div class="stat-pill outbound">
-                <span class="stat-val outbound" id="sec-out-avg-manual">—</span>
-                <span class="stat-lbl">Manual Avg</span>
-            </div>
+            <div class="stat-pill outbound"><span class="stat-val outbound" id="sec-out-avg-manual">—</span><span class="stat-lbl">Manual Avg</span></div>
             <div class="stat-sep" style="background:rgba(74,144,217,0.2);"></div>
-            <div class="stat-pill outbound" style="background:rgba(74,144,217,0.06);outline:1px solid rgba(74,144,217,0.2);outline-offset:-1px;">
-                <span class="stat-val outbound" id="sec-out-closed-today">0</span>
-                <span class="stat-lbl">Today Closed</span>
-            </div>
+            <div class="stat-pill outbound" style="background:rgba(74,144,217,0.06);outline:1px solid rgba(74,144,217,0.2);outline-offset:-1px;"><span class="stat-val outbound" id="sec-out-closed-today">0</span><span class="stat-lbl">Today Closed</span></div>
             <div class="stat-sep"></div>
-            <div class="stat-pill outbound" style="background:rgba(74,144,217,0.06);outline:1px solid rgba(74,144,217,0.2);outline-offset:-1px;">
-                <span class="stat-val outbound" id="sec-out-avg-auto-today">—</span>
-                <span class="stat-lbl">Auto Avg</span>
-            </div>
+            <div class="stat-pill outbound" style="background:rgba(74,144,217,0.06);outline:1px solid rgba(74,144,217,0.2);outline-offset:-1px;"><span class="stat-val outbound" id="sec-out-avg-auto-today">—</span><span class="stat-lbl">Auto Avg</span></div>
             <div class="stat-sep"></div>
-            <div class="stat-pill outbound" style="background:rgba(74,144,217,0.06);outline:1px solid rgba(74,144,217,0.2);outline-offset:-1px;">
-                <span class="stat-val outbound" id="sec-out-avg-manual-today">—</span>
-                <span class="stat-lbl">Manual Avg</span>
-            </div>
+            <div class="stat-pill outbound" style="background:rgba(74,144,217,0.06);outline:1px solid rgba(74,144,217,0.2);outline-offset:-1px;"><span class="stat-val outbound" id="sec-out-avg-manual-today">—</span><span class="stat-lbl">Manual Avg</span></div>
         </div>
         <div class="section-line outbound"></div>
     </div>
     <div class="section-grid" id="grid-outbound">
-        <div class="section-empty" id="empty-outbound">No active outbound pulls</div>
+        <div class="section-empty" id="empty-outbound">No active PI pulls</div>
+    </div>
+
+    <!-- 3. FG Receipts -->
+    <div class="section-header">
+        <span class="section-title fg-in">▼ FG Receipts</span>
+        <div class="section-stats">
+            <div class="stat-pill fg-in"><span class="stat-val fg-in" id="sec-fgin-active">0</span><span class="stat-lbl">Active</span></div>
+            <div class="stat-sep"></div>
+            <div class="stat-pill fg-in"><span class="stat-val fg-in" id="sec-fgin-closed">0</span><span class="stat-lbl">Closed</span></div>
+            <div class="stat-sep"></div>
+            <div class="stat-pill fg-in"><span class="stat-val fg-in" id="sec-fgin-avg">—</span><span class="stat-lbl">Avg</span></div>
+            <div class="stat-sep" style="background:rgba(34,197,94,0.2);"></div>
+            <div class="stat-pill fg-in" style="background:rgba(34,197,94,0.06);outline:1px solid rgba(34,197,94,0.2);outline-offset:-1px;"><span class="stat-val fg-in" id="sec-fgin-closed-today">0</span><span class="stat-lbl">Today Closed</span></div>
+            <div class="stat-sep"></div>
+            <div class="stat-pill fg-in" style="background:rgba(34,197,94,0.06);outline:1px solid rgba(34,197,94,0.2);outline-offset:-1px;"><span class="stat-val fg-in" id="sec-fgin-avg-today">—</span><span class="stat-lbl">Today Avg</span></div>
+        </div>
+        <div class="section-line fg-in"></div>
+    </div>
+    <div class="section-grid" id="grid-fg-in">
+        <div class="section-empty" id="empty-fg-in">No active FG receipts</div>
+    </div>
+
+    <!-- 4. FG Pulls -->
+    <div class="section-header">
+        <span class="section-title fg-out">▲ FG Pulls</span>
+        <div class="section-stats">
+            <div class="stat-pill fg-out"><span class="stat-val fg-out" id="sec-fgout-active">0</span><span class="stat-lbl">Active</span></div>
+            <div class="stat-sep"></div>
+            <div class="stat-pill fg-out"><span class="stat-val fg-out" id="sec-fgout-closed">0</span><span class="stat-lbl">Closed</span></div>
+            <div class="stat-sep"></div>
+            <div class="stat-pill fg-out"><span class="stat-val fg-out" id="sec-fgout-avg-auto">—</span><span class="stat-lbl">Auto Avg</span></div>
+            <div class="stat-sep"></div>
+            <div class="stat-pill fg-out"><span class="stat-val fg-out" id="sec-fgout-avg-manual">—</span><span class="stat-lbl">Manual Avg</span></div>
+            <div class="stat-sep" style="background:rgba(168,85,247,0.2);"></div>
+            <div class="stat-pill fg-out" style="background:rgba(168,85,247,0.06);outline:1px solid rgba(168,85,247,0.2);outline-offset:-1px;"><span class="stat-val fg-out" id="sec-fgout-closed-today">0</span><span class="stat-lbl">Today Closed</span></div>
+            <div class="stat-sep"></div>
+            <div class="stat-pill fg-out" style="background:rgba(168,85,247,0.06);outline:1px solid rgba(168,85,247,0.2);outline-offset:-1px;"><span class="stat-val fg-out" id="sec-fgout-avg-auto-today">—</span><span class="stat-lbl">Auto Avg</span></div>
+            <div class="stat-sep"></div>
+            <div class="stat-pill fg-out" style="background:rgba(168,85,247,0.06);outline:1px solid rgba(168,85,247,0.2);outline-offset:-1px;"><span class="stat-val fg-out" id="sec-fgout-avg-manual-today">—</span><span class="stat-lbl">Manual Avg</span></div>
+        </div>
+        <div class="section-line fg-out"></div>
+    </div>
+    <div class="section-grid" id="grid-fg-out">
+        <div class="section-empty" id="empty-fg-out">No active FG pulls</div>
     </div>
 
 </div>
@@ -1062,28 +1128,32 @@
 
             <!-- KPI Summary Row -->
             <div class="kpi-row" id="kpi-row">
-                <div class="kpi-card"><div class="kpi-val inbound"  id="kpi-in-total">—</div><div class="kpi-lbl">Inbound Closed</div></div>
-                <div class="kpi-card"><div class="kpi-val inbound"  id="kpi-in-avg">—</div><div class="kpi-lbl">Inbound Avg Time</div></div>
-                <div class="kpi-card"><div class="kpi-val success"  id="kpi-in-sla">—</div><div class="kpi-lbl">Inbound SLA %</div></div>
-                <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-total">—</div><div class="kpi-lbl">Outbound Closed</div></div>
-                <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-avg-auto">—</div><div class="kpi-lbl">Auto Avg Time</div></div>
-                <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-avg-manual">—</div><div class="kpi-lbl">Manual Avg Time</div></div>
-                <div class="kpi-card"><div class="kpi-val success"  id="kpi-out-sla-auto">—</div><div class="kpi-lbl">Auto SLA %</div></div>
-                <div class="kpi-card"><div class="kpi-val success"  id="kpi-out-sla-manual">—</div><div class="kpi-lbl">Manual SLA %</div></div>
+                <div class="kpi-card"><div class="kpi-val inbound"  id="kpi-in-total">—</div><div class="kpi-lbl">PI Receipts Closed</div></div>
+                <div class="kpi-card"><div class="kpi-val inbound"  id="kpi-in-avg">—</div><div class="kpi-lbl">PI Receipt Avg</div></div>
+                <div class="kpi-card"><div class="kpi-val success"  id="kpi-in-sla">—</div><div class="kpi-lbl">PI Receipt SLA %</div></div>
+                <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-total">—</div><div class="kpi-lbl">PI Pulls Closed</div></div>
+                <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-avg-auto">—</div><div class="kpi-lbl">PI Auto Avg</div></div>
+                <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-avg-manual">—</div><div class="kpi-lbl">PI Manual Avg</div></div>
+                <div class="kpi-card"><div class="kpi-val success"  id="kpi-out-sla-auto">—</div><div class="kpi-lbl">PI Auto SLA %</div></div>
+                <div class="kpi-card"><div class="kpi-val success"  id="kpi-out-sla-manual">—</div><div class="kpi-lbl">PI Manual SLA %</div></div>
+                <div class="kpi-card"><div class="kpi-val fg-in"    id="kpi-fgin-total">—</div><div class="kpi-lbl">FG Receipts Closed</div></div>
+                <div class="kpi-card"><div class="kpi-val fg-in"    id="kpi-fgin-avg">—</div><div class="kpi-lbl">FG Receipt Avg</div></div>
+                <div class="kpi-card"><div class="kpi-val success"  id="kpi-fgin-sla">—</div><div class="kpi-lbl">FG Receipt SLA %</div></div>
+                <div class="kpi-card"><div class="kpi-val fg-out"   id="kpi-fgout-total">—</div><div class="kpi-lbl">FG Pulls Closed</div></div>
+                <div class="kpi-card"><div class="kpi-val fg-out"   id="kpi-fgout-avg-auto">—</div><div class="kpi-lbl">FG Auto Avg</div></div>
+                <div class="kpi-card"><div class="kpi-val fg-out"   id="kpi-fgout-avg-manual">—</div><div class="kpi-lbl">FG Manual Avg</div></div>
+                <div class="kpi-card"><div class="kpi-val success"  id="kpi-fgout-sla-auto">—</div><div class="kpi-lbl">FG Auto SLA %</div></div>
+                <div class="kpi-card"><div class="kpi-val success"  id="kpi-fgout-sla-manual">—</div><div class="kpi-lbl">FG Manual SLA %</div></div>
             </div>
 
             <!-- Volume Over Time -->
             <div class="chart-section">
                 <div class="chart-section-title">Volume Over Time</div>
                 <div class="chart-grid">
-                    <div class="chart-box">
-                        <div class="chart-box-title">Inbound Receipts Per Day</div>
-                        <canvas id="chart-in-volume" height="180"></canvas>
-                    </div>
-                    <div class="chart-box">
-                        <div class="chart-box-title">Outbound Pulls Per Day</div>
-                        <canvas id="chart-out-volume" height="180"></canvas>
-                    </div>
+                    <div class="chart-box"><div class="chart-box-title">PI Receipts Per Day</div><canvas id="chart-in-volume" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">PI Pulls Per Day</div><canvas id="chart-out-volume" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">FG Receipts Per Day</div><canvas id="chart-fgin-volume" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">FG Pulls Per Day</div><canvas id="chart-fgout-volume" height="180"></canvas></div>
                 </div>
             </div>
 
@@ -1091,14 +1161,10 @@
             <div class="chart-section">
                 <div class="chart-section-title">Average Duration Trend</div>
                 <div class="chart-grid">
-                    <div class="chart-box">
-                        <div class="chart-box-title">Inbound Avg Duration Per Day (hrs)</div>
-                        <canvas id="chart-in-avg" height="180"></canvas>
-                    </div>
-                    <div class="chart-box">
-                        <div class="chart-box-title">Outbound Avg Duration Per Day (hrs)</div>
-                        <canvas id="chart-out-avg" height="180"></canvas>
-                    </div>
+                    <div class="chart-box"><div class="chart-box-title">PI Receipt Avg Duration Per Day (hrs)</div><canvas id="chart-in-avg" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">PI Pull Avg Duration Per Day (hrs)</div><canvas id="chart-out-avg" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">FG Receipt Avg Duration Per Day (hrs)</div><canvas id="chart-fgin-avg" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">FG Pull Avg Duration Per Day (hrs)</div><canvas id="chart-fgout-avg" height="180"></canvas></div>
                 </div>
             </div>
 
@@ -1106,14 +1172,10 @@
             <div class="chart-section">
                 <div class="chart-section-title">SLA Compliance</div>
                 <div class="chart-grid">
-                    <div class="chart-box">
-                        <div class="chart-box-title">Inbound SLA Compliance Over Time (%)</div>
-                        <canvas id="chart-in-sla" height="180"></canvas>
-                    </div>
-                    <div class="chart-box">
-                        <div class="chart-box-title">Outbound SLA Compliance — Auto vs Manual (%)</div>
-                        <canvas id="chart-out-sla" height="180"></canvas>
-                    </div>
+                    <div class="chart-box"><div class="chart-box-title">PI Receipt SLA Over Time (%)</div><canvas id="chart-in-sla" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">PI Pull SLA — Auto vs Manual (%)</div><canvas id="chart-out-sla" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">FG Receipt SLA Over Time (%)</div><canvas id="chart-fgin-sla" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">FG Pull SLA — Auto vs Manual (%)</div><canvas id="chart-fgout-sla" height="180"></canvas></div>
                 </div>
             </div>
 
@@ -1121,33 +1183,22 @@
             <div class="chart-section">
                 <div class="chart-section-title">Breakdown by Type</div>
                 <div class="chart-grid triple">
-                    <div class="chart-box">
-                        <div class="chart-box-title">Inbound — Manufacturer vs Transfer</div>
-                        <canvas id="chart-in-type" height="200"></canvas>
-                    </div>
-                    <div class="chart-box">
-                        <div class="chart-box-title">Outbound — Auto vs Manual Volume</div>
-                        <canvas id="chart-out-type-vol" height="200"></canvas>
-                    </div>
-                    <div class="chart-box">
-                        <div class="chart-box-title">Outbound — Auto vs Manual Avg Duration</div>
-                        <canvas id="chart-out-type-avg" height="200"></canvas>
-                    </div>
+                    <div class="chart-box"><div class="chart-box-title">PI Receipts — Manufacturer vs Transfer</div><canvas id="chart-in-type" height="200"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">PI Pulls — Auto vs Manual Volume</div><canvas id="chart-out-type-vol" height="200"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">PI Pulls — Auto vs Manual Avg Duration</div><canvas id="chart-out-type-avg" height="200"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">FG Pulls — Auto vs Manual Volume</div><canvas id="chart-fgout-type-vol" height="200"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">FG Pulls — Auto vs Manual Avg Duration</div><canvas id="chart-fgout-type-avg" height="200"></canvas></div>
                 </div>
             </div>
 
-            <!-- Peak Hours Heatmap -->
+            <!-- Peak Hours -->
             <div class="chart-section">
                 <div class="chart-section-title">Peak Activity Hours</div>
                 <div class="chart-grid">
-                    <div class="chart-box">
-                        <div class="chart-box-title">Inbound — Receipts Started by Hour of Day</div>
-                        <canvas id="chart-in-hours" height="180"></canvas>
-                    </div>
-                    <div class="chart-box">
-                        <div class="chart-box-title">Outbound — Pulls Started by Hour of Day</div>
-                        <canvas id="chart-out-hours" height="180"></canvas>
-                    </div>
+                    <div class="chart-box"><div class="chart-box-title">PI Receipts Started by Hour</div><canvas id="chart-in-hours" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">PI Pulls Started by Hour</div><canvas id="chart-out-hours" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">FG Receipts Started by Hour</div><canvas id="chart-fgin-hours" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">FG Pulls Started by Hour</div><canvas id="chart-fgout-hours" height="180"></canvas></div>
                 </div>
             </div>
 
@@ -1177,11 +1228,11 @@
     </div>
 </div>
 
-<!-- Outbound Log Overlay -->
+<!-- PI Pull Log Overlay -->
 <div class="log-overlay" id="log-outbound">
     <div class="log-modal">
         <div class="log-header" style="border-top: 4px solid var(--outbound); border-radius: 16px 16px 0 0;">
-            <h2 style="color:var(--outbound);">▲ Outbound Pull History</h2>
+            <h2 style="color:var(--outbound);">▲ PI Pull History</h2>
             <div style="display:flex;gap:10px;">
                 <button class="log-close-btn" onclick="exportCSV('outbound')" style="background:var(--outbound);border-color:var(--outbound);color:#fff;">⬇ Export CSV</button>
                 <button class="log-close-btn" onclick="toggleLog('outbound')">✕ Close</button>
@@ -1194,6 +1245,49 @@
                     <th>Started</th><th>Completed</th><th>Duration</th>
                 </tr></thead>
                 <tbody id="log-outbound-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- FG Receipt Log Overlay -->
+<div class="log-overlay" id="log-fg-rec">
+    <div class="log-modal">
+        <div class="log-header" style="border-top: 4px solid var(--fg-in); border-radius: 16px 16px 0 0;">
+            <h2 style="color:var(--fg-in);">▼ FG Receipt History</h2>
+            <div style="display:flex;gap:10px;">
+                <button class="log-close-btn" onclick="exportCSV('fg-rec')" style="background:var(--fg-in);border-color:var(--fg-in);color:#000;">⬇ Export CSV</button>
+                <button class="log-close-btn" onclick="toggleLog('fg-rec')">✕ Close</button>
+            </div>
+        </div>
+        <div class="log-body">
+            <table>
+                <thead><tr>
+                    <th>PO/DN</th><th>Qty</th><th>Started</th><th>Ended</th><th>Duration</th>
+                </tr></thead>
+                <tbody id="log-fg-rec-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- FG Pull Log Overlay -->
+<div class="log-overlay" id="log-fg-pull">
+    <div class="log-modal">
+        <div class="log-header" style="border-top: 4px solid var(--fg-out); border-radius: 16px 16px 0 0;">
+            <h2 style="color:var(--fg-out);">▲ FG Pull History</h2>
+            <div style="display:flex;gap:10px;">
+                <button class="log-close-btn" onclick="exportCSV('fg-pull')" style="background:var(--fg-out);border-color:var(--fg-out);color:#fff;">⬇ Export CSV</button>
+                <button class="log-close-btn" onclick="toggleLog('fg-pull')">✕ Close</button>
+            </div>
+        </div>
+        <div class="log-body">
+            <table>
+                <thead><tr>
+                    <th>Pull ID</th><th>Type</th><th>Qty</th>
+                    <th>Started</th><th>Completed</th><th>Duration</th>
+                </tr></thead>
+                <tbody id="log-fg-pull-body"></tbody>
             </table>
         </div>
     </div>
@@ -1215,23 +1309,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
     // ── API ENDPOINTS ───────────────────────────────────────
-    const REC_API  = "https://script.google.com/macros/s/AKfycbzlqj_tnDRI6tGDy5MCjyq3XovJmoTCWhvhZqHKMjuDDjil7j6kcwyGHrjGnbYhXURaow/exec";
-    const PULL_API = "https://script.google.com/macros/s/AKfycbxHR1-V7u-cF1paXo6JGAbyvljuPp5IVNT2l10vX8y-JdcO7phjMKwDTZ36eynEWWO-_w/exec";
+    const REC_API    = "https://script.google.com/macros/s/AKfycbzlqj_tnDRI6tGDy5MCjyq3XovJmoTCWhvhZqHKMjuDDjil7j6kcwyGHrjGnbYhXURaow/exec";
+    const PULL_API   = "https://script.google.com/macros/s/AKfycbxHR1-V7u-cF1paXo6JGAbyvljuPp5IVNT2l10vX8y-JdcO7phjMKwDTZ36eynEWWO-_w/exec";
+    const FG_REC_API  = "https://script.google.com/macros/s/AKfycbx326pKvmwfMuy-1xqHKKre8XL7JTxm1Nj-Bj-wzWpla39S_pvsP4mXChs5CRNU27ih/exec";  // ← replace after deploying
+    const FG_PULL_API = "https://script.google.com/macros/s/AKfycbw-C3wpB6xXoIfStmMBb46kdXMmCha9BCY_XuX29iO5h3IRiEr7W19oWCO97y_7D22wXw/exec";     // ← replace after deploying
 
-    // ── SLA THRESHOLDS ──────────────────────────────────────
-    // Inbound (all trailers): green→yellow 2h, yellow→red+flash 4h, true 5h
-    const REC_SLA = { amber: 7200000, red: 14400000, true: 18000000 };
+    // SLA thresholds (ms)
+    const PI_REC_SLA  = { amber: 7200000,  red: 14400000, true: 18000000 };           // 2h / 4h / 5h
+    const PI_PULL_SLA = { manual: { amber:1800000, red:2700000,  true:3600000  },      // 30m / 45m / 1h
+                          auto:   { amber:7200000, red:14400000, true:18000000 } };    // 2h  / 4h  / 5h
+    const FG_REC_SLA  = { amber: 3600000,  red: 5400000,  true: 7200000  };           // 1h / 1.5h / 2h
+    const FG_PULL_SLA = { manual: { amber:1800000, red:2700000,  true:3600000  },
+                          auto:   { amber:7200000, red:14400000, true:18000000 } };
 
-    // Outbound per pull type
-    const PULL_SLA = {
-        manual: { amber: 1800000,  red: 2700000,  true: 3600000  },
-        auto:   { amber: 7200000,  red: 14400000, true: 18000000 }
-    };
-
-    let activeRecs  = {};   // inbound
-    let activeWaves = {};   // outbound
-    let pendingClose = null;
-    let currentMode  = 'inbound';
+    let activeRecs    = {};
+    let activeWaves   = {};
+    let activeFgRecs  = {};
+    let activeFgPulls = {};
+    let pendingClose  = null;
+    let currentMode   = 'pi-rec';
 
     // ── SIDEBAR & MODE ──────────────────────────────────────
     function toggleSidebar() {
@@ -1241,112 +1337,89 @@
 
     function setMode(mode) {
         currentMode = mode;
-        document.getElementById('inbound-panel').classList.toggle('active', mode === 'inbound');
-        document.getElementById('outbound-panel').classList.toggle('active', mode === 'outbound');
-        document.getElementById('mode-inbound').className  = 'mode-btn' + (mode === 'inbound'  ? ' active-inbound'  : '');
-        document.getElementById('mode-outbound').className = 'mode-btn' + (mode === 'outbound' ? ' active-outbound' : '');
+        ['pi-rec','pi-pull','fg-rec','fg-pull'].forEach(m => {
+            document.getElementById(`${m}-panel`).classList.toggle('active', m === mode);
+            const btn = document.getElementById(`mode-${m}`);
+            const activeClass = { 'pi-rec':'active-inbound','pi-pull':'active-outbound','fg-rec':'active-fg-in','fg-pull':'active-fg-out' }[m];
+            btn.className = 'mode-btn' + (m === mode ? ` ${activeClass}` : '');
+        });
     }
 
-    // ── SYNC BOTH APIs ──────────────────────────────────────
+    // ── SYNC ALL FOUR APIs ──────────────────────────────────
     async function syncAll() {
         let online = false;
-        try {
-            const r = await fetch(`${REC_API}?action=GET_ACTIVE&t=${Date.now()}`);
-            activeRecs = await r.json();
-            online = true;
-        } catch { activeRecs = {}; }
-
-        try {
-            const r = await fetch(`${PULL_API}?action=GET_ACTIVE&t=${Date.now()}`);
-            activeWaves = await r.json();
-            online = true;
-        } catch { activeWaves = {}; }
+        try { const r = await fetch(`${REC_API}?action=GET_ACTIVE&t=${Date.now()}`);    activeRecs    = await r.json(); online = true; } catch { activeRecs    = {}; }
+        try { const r = await fetch(`${PULL_API}?action=GET_ACTIVE&t=${Date.now()}`);   activeWaves   = await r.json(); online = true; } catch { activeWaves   = {}; }
+        try { const r = await fetch(`${FG_REC_API}?action=GET_ACTIVE&t=${Date.now()}`); activeFgRecs  = await r.json(); online = true; } catch { activeFgRecs  = {}; }
+        try { const r = await fetch(`${FG_PULL_API}?action=GET_ACTIVE&t=${Date.now()}`);activeFgPulls = await r.json(); online = true; } catch { activeFgPulls = {}; }
 
         const ts = new Date().toLocaleTimeString();
         document.getElementById('syncStatus').innerText  = online ? `● ONLINE — ${ts}` : '● OFFLINE';
         document.getElementById('syncStatus').style.color = online ? 'var(--success)' : 'var(--danger)';
-
         updateSummary();
         invalidateAnalyticsCache();
     }
 
     // ── SHIFT SUMMARY ──────────────────────────────────────
     async function updateSummary() {
-        document.getElementById('in-active').innerText  = Object.keys(activeRecs).length;
-        document.getElementById('out-active').innerText = Object.keys(activeWaves).length;
+        document.getElementById('in-active').innerText     = Object.keys(activeRecs).length;
+        document.getElementById('out-active').innerText    = Object.keys(activeWaves).length;
+        document.getElementById('fgin-active').innerText   = Object.keys(activeFgRecs).length;
+        document.getElementById('fgout-active').innerText  = Object.keys(activeFgPulls).length;
 
-        // helper: midnight timestamp for today
         const todayStart = new Date(); todayStart.setHours(0,0,0,0);
         const todayMs    = todayStart.getTime();
 
-        // helper: compute avg from array of minute values
-        function avg(arr) {
-            const f = arr.filter(d => d > 0);
-            return f.length ? Math.round(f.reduce((a,b)=>a+b,0) / f.length) : null;
-        }
+        function avg(arr) { const f=arr.filter(d=>d>0); return f.length ? Math.round(f.reduce((a,b)=>a+b,0)/f.length) : null; }
 
-        // ── INBOUND ─────────────────────────────────────────
+        // PI Receipts
         try {
-            const r    = await fetch(`${REC_API}?action=GET_LOG&t=${Date.now()}`);
-            const data = await r.json();
-            const rows = data.slice(1);
-
-            // endTime is row[5], duration is row[6]
-            const todayRows = rows.filter(r => {
-                const ts = Number(r[5]);
-                return !isNaN(ts) && ts >= todayMs;
-            });
-
-            const allAvg   = avg(rows.map(r => parseDuration(r[6])));
-            const todayAvg = avg(todayRows.map(r => parseDuration(r[6])));
-
-            // sidebar
-            document.getElementById('in-closed').innerText     = rows.length;
-            document.getElementById('in-avg').innerText        = allAvg   ? fmtAvg(allAvg)   : '—';
-            document.getElementById('in-closed-today').innerText = todayRows.length;
-            document.getElementById('in-avg-today').innerText  = todayAvg ? fmtAvg(todayAvg) : '—';
-
-            // section header
-            document.getElementById('sec-in-closed').innerText      = rows.length;
-            document.getElementById('sec-in-avg').innerText         = allAvg   ? fmtAvg(allAvg)   : '—';
-            document.getElementById('sec-in-closed-today').innerText = todayRows.length;
-            document.getElementById('sec-in-avg-today').innerText   = todayAvg ? fmtAvg(todayAvg) : '—';
+            const d = (await (await fetch(`${REC_API}?action=GET_LOG&t=${Date.now()}`)).json()).slice(1);
+            const todayD = d.filter(r => Number(r[5]) >= todayMs);
+            const a = avg(d.map(r=>parseDuration(r[6]))), ta = avg(todayD.map(r=>parseDuration(r[6])));
+            setIds({ 'in-closed':d.length,'in-avg':a?fmtAvg(a):'—','in-closed-today':todayD.length,'in-avg-today':ta?fmtAvg(ta):'—',
+                     'sec-in-closed':d.length,'sec-in-avg':a?fmtAvg(a):'—','sec-in-closed-today':todayD.length,'sec-in-avg-today':ta?fmtAvg(ta):'—' });
         } catch {}
 
-        // ── OUTBOUND ────────────────────────────────────────
+        // PI Pulls
         try {
-            const r    = await fetch(`${PULL_API}?action=GET_LOG&t=${Date.now()}`);
-            const data = await r.json();
-            const rows = data.slice(1);
+            const d = (await (await fetch(`${PULL_API}?action=GET_LOG&t=${Date.now()}`)).json()).slice(1);
+            const todayD = d.filter(r => Number(r[4]) >= todayMs);
+            const autoA=avg(d.filter(r=>r[1]==='auto').map(r=>parseDuration(r[5]))),
+                  manA =avg(d.filter(r=>r[1]==='manual').map(r=>parseDuration(r[5]))),
+                  autoAT=avg(todayD.filter(r=>r[1]==='auto').map(r=>parseDuration(r[5]))),
+                  manAT =avg(todayD.filter(r=>r[1]==='manual').map(r=>parseDuration(r[5])));
+            setIds({ 'out-closed':d.length,'out-avg':autoA?fmtAvg(autoA):'—','out-avg-manual':manA?fmtAvg(manA):'—',
+                     'out-closed-today':todayD.length,'out-avg-auto-today':autoAT?fmtAvg(autoAT):'—','out-avg-manual-today':manAT?fmtAvg(manAT):'—',
+                     'sec-out-closed':d.length,'sec-out-avg-auto':autoA?fmtAvg(autoA):'—','sec-out-avg-manual':manA?fmtAvg(manA):'—',
+                     'sec-out-closed-today':todayD.length,'sec-out-avg-auto-today':autoAT?fmtAvg(autoAT):'—','sec-out-avg-manual-today':manAT?fmtAvg(manAT):'—' });
+        } catch {}
 
-            // endTime is row[4], type is row[1], duration is row[5]
-            const todayRows   = rows.filter(r => {
-                const ts = Number(r[4]);
-                return !isNaN(ts) && ts >= todayMs;
-            });
+        // FG Receipts — archive cols: PO/DN(0), Qty(1), Started(2), Ended(3), Duration(4)
+        try {
+            const d = (await (await fetch(`${FG_REC_API}?action=GET_LOG&t=${Date.now()}`)).json()).slice(1);
+            const todayD = d.filter(r => Number(r[3]) >= todayMs);
+            const a = avg(d.map(r=>parseDuration(r[4]))), ta = avg(todayD.map(r=>parseDuration(r[4])));
+            setIds({ 'fgin-closed':d.length,'fgin-avg':a?fmtAvg(a):'—','fgin-closed-today':todayD.length,'fgin-avg-today':ta?fmtAvg(ta):'—',
+                     'sec-fgin-closed':d.length,'sec-fgin-avg':a?fmtAvg(a):'—','sec-fgin-closed-today':todayD.length,'sec-fgin-avg-today':ta?fmtAvg(ta):'—' });
+        } catch {}
 
-            const autoAll     = avg(rows.filter(r => r[1]==='auto')  .map(r => parseDuration(r[5])));
-            const manualAll   = avg(rows.filter(r => r[1]==='manual').map(r => parseDuration(r[5])));
-            const autoToday   = avg(todayRows.filter(r => r[1]==='auto')  .map(r => parseDuration(r[5])));
-            const manualToday = avg(todayRows.filter(r => r[1]==='manual').map(r => parseDuration(r[5])));
-
-            // sidebar
-            document.getElementById('out-closed').innerText          = rows.length;
-            document.getElementById('out-avg').innerText             = autoAll   ? fmtAvg(autoAll)   : '—';
-            document.getElementById('out-avg-manual').innerText      = manualAll ? fmtAvg(manualAll) : '—';
-            document.getElementById('out-closed-today').innerText    = todayRows.length;
-            document.getElementById('out-avg-auto-today').innerText   = autoToday   ? fmtAvg(autoToday)   : '—';
-            document.getElementById('out-avg-manual-today').innerText = manualToday ? fmtAvg(manualToday) : '—';
-
-            // section header
-            document.getElementById('sec-out-closed').innerText          = rows.length;
-            document.getElementById('sec-out-avg-auto').innerText        = autoAll   ? fmtAvg(autoAll)   : '—';
-            document.getElementById('sec-out-avg-manual').innerText      = manualAll ? fmtAvg(manualAll) : '—';
-            document.getElementById('sec-out-closed-today').innerText    = todayRows.length;
-            document.getElementById('sec-out-avg-auto-today').innerText   = autoToday   ? fmtAvg(autoToday)   : '—';
-            document.getElementById('sec-out-avg-manual-today').innerText = manualToday ? fmtAvg(manualToday) : '—';
+        // FG Pulls — archive cols: ID(0), Type(1), Qty(2), StartTime(3), EndTime(4), Duration(5)
+        try {
+            const d = (await (await fetch(`${FG_PULL_API}?action=GET_LOG&t=${Date.now()}`)).json()).slice(1);
+            const todayD = d.filter(r => Number(r[4]) >= todayMs);
+            const autoA=avg(d.filter(r=>r[1]==='auto').map(r=>parseDuration(r[5]))),
+                  manA =avg(d.filter(r=>r[1]==='manual').map(r=>parseDuration(r[5]))),
+                  autoAT=avg(todayD.filter(r=>r[1]==='auto').map(r=>parseDuration(r[5]))),
+                  manAT =avg(todayD.filter(r=>r[1]==='manual').map(r=>parseDuration(r[5])));
+            setIds({ 'fgout-closed':d.length,'fgout-avg':autoA?fmtAvg(autoA):'—','fgout-avg-manual':manA?fmtAvg(manA):'—',
+                     'fgout-closed-today':todayD.length,'fgout-avg-auto-today':autoAT?fmtAvg(autoAT):'—','fgout-avg-manual-today':manAT?fmtAvg(manAT):'—',
+                     'sec-fgout-closed':d.length,'sec-fgout-avg-auto':autoA?fmtAvg(autoA):'—','sec-fgout-avg-manual':manA?fmtAvg(manA):'—',
+                     'sec-fgout-closed-today':todayD.length,'sec-fgout-avg-auto-today':autoAT?fmtAvg(autoAT):'—','sec-fgout-avg-manual-today':manAT?fmtAvg(manAT):'—' });
         } catch {}
     }
+
+    function setIds(map) { for (const [id, val] of Object.entries(map)) { const el=document.getElementById(id); if(el) el.innerText=val; } }
 
     function parseDuration(str) {
         if (!str) return 0;
@@ -1356,287 +1429,269 @@
         return parseInt(m[0]);
     }
 
-    function fmtAvg(min) {
-        return min >= 60 ? `${Math.floor(min/60)}h${min%60}m` : `${min}m`;
-    }
+    function fmtAvg(min) { return min >= 60 ? `${Math.floor(min/60)}h${min%60}m` : `${min}m`; }
 
-    // ── INBOUND: START ──────────────────────────────────────
+    // ── PI RECEIPT CRUD ─────────────────────────────────────
     async function startRec() {
-        const door    = document.getElementById('in-door').value.trim();
-        const trailer = document.getElementById('in-trailer').value.trim();
-        const bol     = document.getElementById('in-bol').value.trim();
-        const type    = document.getElementById('in-type').value;
-        if (!door || !trailer) { alert('Dock Door and Trailer # are required.'); return; }
-
-        setSaving('inbound', true);
-        await fetch(REC_API, {
-            method: 'POST',
-            body: JSON.stringify({ action:'START_REC', door, trailer, bol, type, startTime: Date.now() }),
-            mode: 'no-cors'
-        });
-        document.getElementById('in-door').value    = '';
-        document.getElementById('in-trailer').value = '';
-        document.getElementById('in-bol').value     = '';
-        setTimeout(() => { syncAll(); setSaving('inbound', false); }, 2500);
+        const door=document.getElementById('in-door').value.trim(), trailer=document.getElementById('in-trailer').value.trim(),
+              bol=document.getElementById('in-bol').value.trim(), type=document.getElementById('in-type').value;
+        if (!door||!trailer) { alert('Dock Door and Trailer # are required.'); return; }
+        setSaving('in-saving',true);
+        await fetch(REC_API,{method:'POST',body:JSON.stringify({action:'START_REC',door,trailer,bol,type,startTime:Date.now()}),mode:'no-cors'});
+        document.getElementById('in-door').value=''; document.getElementById('in-trailer').value=''; document.getElementById('in-bol').value='';
+        setTimeout(()=>{syncAll();setSaving('in-saving',false);},2500);
     }
 
-    // ── INBOUND: CLOSE ──────────────────────────────────────
     function initiateCloseRec() {
-        const trailerVal = document.getElementById('in-trailer').value.trim();
-        if (!trailerVal) { alert('Select an active receipt card or enter a Trailer # to close.'); return; }
-        const key = Object.keys(activeRecs).find(k => activeRecs[k].trailer === trailerVal || k === trailerVal);
-        if (!key) { alert('No active receipt found for that Trailer #.'); return; }
-        pendingClose = { kind: 'rec', key, item: activeRecs[key] };
-        showConfirm('rec', activeRecs[key]);
+        const t=document.getElementById('in-trailer').value.trim();
+        if (!t) { alert('Select an active receipt card or enter a Trailer # to close.'); return; }
+        const key=Object.keys(activeRecs).find(k=>activeRecs[k].trailer===t||k===t);
+        if (!key) { alert('No active PI receipt found for that Trailer #.'); return; }
+        pendingClose={kind:'rec',key,item:activeRecs[key]}; showConfirm('rec',activeRecs[key]);
     }
 
-    function initiateCloseRecByKey(key) {
-        pendingClose = { kind: 'rec', key, item: activeRecs[key] };
-        showConfirm('rec', activeRecs[key]);
-    }
+    function initiateCloseRecByKey(key) { pendingClose={kind:'rec',key,item:activeRecs[key]}; showConfirm('rec',activeRecs[key]); }
 
-    // ── OUTBOUND: START ─────────────────────────────────────
+    // ── PI PULL CRUD ────────────────────────────────────────
     async function startWave() {
-        const id   = document.getElementById('out-id').value.trim();
-        const qty  = document.getElementById('out-qty').value;
-        const type = document.getElementById('out-type').value;
+        const id=document.getElementById('out-id').value.trim(), qty=document.getElementById('out-qty').value, type=document.getElementById('out-type').value;
         if (!id) { alert('Please enter a Pull ID.'); return; }
-
-        setSaving('outbound', true);
-        await fetch(PULL_API, {
-            method: 'POST',
-            body: JSON.stringify({ action:'START_WAVE', id, qty, type, startTime: Date.now() }),
-            mode: 'no-cors'
-        });
-        document.getElementById('out-id').value  = '';
-        document.getElementById('out-qty').value = '';
-        setTimeout(() => { syncAll(); setSaving('outbound', false); }, 2500);
+        setSaving('out-saving',true);
+        await fetch(PULL_API,{method:'POST',body:JSON.stringify({action:'START_WAVE',id,qty,type,startTime:Date.now()}),mode:'no-cors'});
+        document.getElementById('out-id').value=''; document.getElementById('out-qty').value='';
+        setTimeout(()=>{syncAll();setSaving('out-saving',false);},2500);
     }
 
-    // ── OUTBOUND: CLOSE ─────────────────────────────────────
     function initiateCloseWave() {
-        const idVal = document.getElementById('out-id').value.trim();
-        if (!idVal) { alert('Select an active pull card or enter a Pull ID to close.'); return; }
-        if (!activeWaves[idVal]) { alert('No active pull found for that ID.'); return; }
-        pendingClose = { kind: 'wave', key: idVal, item: activeWaves[idVal] };
-        showConfirm('wave', activeWaves[idVal]);
+        const idVal=document.getElementById('out-id').value.trim();
+        if (!idVal) { alert('Select an active PI pull card or enter a Pull ID to close.'); return; }
+        if (!activeWaves[idVal]) { alert('No active PI pull found for that ID.'); return; }
+        pendingClose={kind:'wave',key:idVal,item:activeWaves[idVal]}; showConfirm('wave',activeWaves[idVal]);
     }
 
-    function initiateCloseWaveById(id) {
-        pendingClose = { kind: 'wave', key: id, item: activeWaves[id] };
-        showConfirm('wave', activeWaves[id]);
+    function initiateCloseWaveById(id) { pendingClose={kind:'wave',key:id,item:activeWaves[id]}; showConfirm('wave',activeWaves[id]); }
+
+    // ── FG RECEIPT CRUD ─────────────────────────────────────
+    async function startFgRec() {
+        const po=document.getElementById('fgin-po').value.trim(), qty=document.getElementById('fgin-qty').value;
+        if (!po) { alert('PO/DN is required.'); return; }
+        setSaving('fgin-saving',true);
+        // Uses START_WAVE action — matches the copied PI Pull Apps Script structure
+        // po stored as 'id', qty stored as 'qty', type fixed as 'fg-receipt'
+        await fetch(FG_REC_API,{method:'POST',body:JSON.stringify({action:'START_WAVE',id:po,qty,type:'fg-receipt',startTime:Date.now()}),mode:'no-cors'});
+        document.getElementById('fgin-po').value=''; document.getElementById('fgin-qty').value='';
+        setTimeout(()=>{syncAll();setSaving('fgin-saving',false);},2500);
+    }
+
+    function initiateCloseFgRec() {
+        const poVal=document.getElementById('fgin-po').value.trim();
+        if (!poVal) { alert('Select an active FG receipt card or enter a PO/DN to close.'); return; }
+        // activeFgRecs keyed by the id field (which stores the PO/DN)
+        const key=Object.keys(activeFgRecs).find(k=>k===poVal||activeFgRecs[k].id===poVal);
+        if (!key) { alert('No active FG receipt found for that PO/DN.'); return; }
+        pendingClose={kind:'fg-rec',key,item:activeFgRecs[key]}; showConfirm('fg-rec',activeFgRecs[key]);
+    }
+
+    function initiateCloseFgRecByKey(key) {
+        const item = activeFgRecs[key];
+        if (!item) return;
+        pendingClose={kind:'fg-rec',key,item}; showConfirm('fg-rec',item);
+    }
+
+    // ── FG PULL CRUD ────────────────────────────────────────
+    async function startFgPull() {
+        const id=document.getElementById('fgout-id').value.trim(), qty=document.getElementById('fgout-qty').value, type=document.getElementById('fgout-type').value;
+        if (!id) { alert('Please enter a Pull ID.'); return; }
+        setSaving('fgout-saving',true);
+        await fetch(FG_PULL_API,{method:'POST',body:JSON.stringify({action:'START_WAVE',id,qty,type,startTime:Date.now()}),mode:'no-cors'});
+        document.getElementById('fgout-id').value=''; document.getElementById('fgout-qty').value='';
+        setTimeout(()=>{syncAll();setSaving('fgout-saving',false);},2500);
+    }
+
+    function initiateCloseFgPull() {
+        const idVal=document.getElementById('fgout-id').value.trim();
+        if (!idVal) { alert('Select an active FG pull card or enter a Pull ID to close.'); return; }
+        if (!activeFgPulls[idVal]) { alert('No active FG pull found for that ID.'); return; }
+        pendingClose={kind:'fg-pull',key:idVal,item:activeFgPulls[idVal]}; showConfirm('fg-pull',activeFgPulls[idVal]);
+    }
+
+    function initiateCloseFgPullById(id) {
+        const item = activeFgPulls[id];
+        if (!item) return;
+        pendingClose={kind:'fg-pull',key:id,item}; showConfirm('fg-pull',item);
     }
 
     // ── CONFIRM DIALOG ──────────────────────────────────────
     function showConfirm(kind, item) {
-        document.getElementById('confirm-title').innerText = kind === 'rec' ? 'Close Receipt?' : 'Complete Pull?';
+        const titles = {'rec':'Close PI Receipt?','wave':'Complete PI Pull?','fg-rec':'Close FG Receipt?','fg-pull':'Complete FG Pull?'};
+        document.getElementById('confirm-title').innerText = titles[kind] || 'Archive?';
         document.getElementById('confirm-sub').innerText   = 'This will archive the record and stop tracking.';
-        document.getElementById('confirm-info').innerHTML  = kind === 'rec'
-            ? `Door <strong>${item.door}</strong> &nbsp;·&nbsp; Trailer <strong>${item.trailer}</strong>` + (item.bol ? ` &nbsp;·&nbsp; BOL <strong>${item.bol}</strong>` : '')
-            : `Pull ID <strong>#${item.id}</strong> &nbsp;·&nbsp; <strong>${item.type === 'manual' ? 'Manual' : 'Auto'}</strong>` + (item.qty ? ` &nbsp;·&nbsp; QTY <strong>${item.qty}</strong>` : '');
+        if (kind==='rec')
+            document.getElementById('confirm-info').innerHTML = `Door <strong>${item.door}</strong> &nbsp;·&nbsp; Trailer <strong>${item.trailer}</strong>`+(item.bol?` &nbsp;·&nbsp; BOL <strong>${item.bol}</strong>`:'');
+        else if (kind==='fg-rec')
+            document.getElementById('confirm-info').innerHTML = `PO/DN <strong>${item.id}</strong>`+(item.qty?` &nbsp;·&nbsp; QTY <strong>${item.qty}</strong>`:'');
+        else
+            document.getElementById('confirm-info').innerHTML = `Pull ID <strong>#${item.id}</strong> &nbsp;·&nbsp; <strong>${item.type==='manual'?'Manual':'Auto'}</strong>`+(item.qty?` &nbsp;·&nbsp; QTY <strong>${item.qty}</strong>`:'');
         document.getElementById('confirm-overlay').classList.add('visible');
     }
 
-    function hideConfirm() {
-        document.getElementById('confirm-overlay').classList.remove('visible');
-        pendingClose = null;
-    }
+    function hideConfirm() { document.getElementById('confirm-overlay').classList.remove('visible'); pendingClose=null; }
 
     async function confirmClose() {
         if (!pendingClose) return;
-        const { kind, key, item } = pendingClose;  // capture BEFORE hideConfirm nulls it
-        hideConfirm();
-        const elapsed  = Date.now() - item.startTime;
-        const totalMin = Math.floor(elapsed / 60000);
-        const duration = totalMin >= 60 ? `${Math.floor(totalMin/60)}h ${totalMin%60}m` : `${totalMin}m`;
+        const {kind,key,item} = pendingClose; hideConfirm();
+        const elapsed=Date.now()-item.startTime, totalMin=Math.floor(elapsed/60000);
+        const duration = totalMin>=60 ? `${Math.floor(totalMin/60)}h ${totalMin%60}m` : `${totalMin}m`;
 
-        if (kind === 'rec') {
-            setSaving('inbound', true);
-            await fetch(REC_API, {
-                method: 'POST',
-                body: JSON.stringify({ action:'CLOSE_REC', trailer: item.trailer, key, endTime: Date.now(), duration }),
-                mode: 'no-cors'
-            });
-            document.getElementById('in-trailer').value = '';
-            document.getElementById('in-door').value    = '';
-            setTimeout(() => { syncAll(); setSaving('inbound', false); }, 2500);
+        if (kind==='rec') {
+            setSaving('in-saving',true);
+            await fetch(REC_API,{method:'POST',body:JSON.stringify({action:'CLOSE_REC',trailer:item.trailer,key,endTime:Date.now(),duration}),mode:'no-cors'});
+            document.getElementById('in-trailer').value=''; document.getElementById('in-door').value='';
+            setTimeout(()=>{syncAll();setSaving('in-saving',false);},2500);
+        } else if (kind==='wave') {
+            setSaving('out-saving',true);
+            await fetch(PULL_API,{method:'POST',body:JSON.stringify({action:'CLOSE_WAVE',id:key,endTime:Date.now(),duration}),mode:'no-cors'});
+            document.getElementById('out-id').value=''; document.getElementById('out-qty').value='';
+            setTimeout(()=>{syncAll();setSaving('out-saving',false);},2500);
+        } else if (kind==='fg-rec') {
+            setSaving('fgin-saving',true);
+            // CLOSE_WAVE matches the copied PI Pull Apps Script — id is the PO/DN value
+            await fetch(FG_REC_API,{method:'POST',body:JSON.stringify({action:'CLOSE_WAVE',id:key,endTime:Date.now(),duration}),mode:'no-cors'});
+            document.getElementById('fgin-po').value=''; document.getElementById('fgin-qty').value='';
+            setTimeout(()=>{syncAll();setSaving('fgin-saving',false);},2500);
         } else {
-            setSaving('outbound', true);
-            await fetch(PULL_API, {
-                method: 'POST',
-                body: JSON.stringify({ action:'CLOSE_WAVE', id: key, endTime: Date.now(), duration }),
-                mode: 'no-cors'
-            });
-            document.getElementById('out-id').value  = '';
-            document.getElementById('out-qty').value = '';
-            setTimeout(() => { syncAll(); setSaving('outbound', false); }, 2500);
+            setSaving('fgout-saving',true);
+            await fetch(FG_PULL_API,{method:'POST',body:JSON.stringify({action:'CLOSE_WAVE',id:key,endTime:Date.now(),duration}),mode:'no-cors'});
+            document.getElementById('fgout-id').value=''; document.getElementById('fgout-qty').value='';
+            setTimeout(()=>{syncAll();setSaving('fgout-saving',false);},2500);
         }
     }
 
-    function setSaving(which, on) {
-        document.getElementById(which === 'inbound' ? 'in-saving' : 'out-saving')
-            .classList.toggle('visible', on);
-    }
+    function setSaving(id, on) { document.getElementById(id).classList.toggle('visible', on); }
 
-    // ── RENDER (two sections, each urgency-sorted) ──────────
+    // ── RENDER ─────────────────────────────────────────────
     function renderAll() {
         const now = Date.now();
 
-        // build & sort inbound
-        const inItems = Object.keys(activeRecs).map(key => {
-            const item = activeRecs[key];
-            const elapsed = now - item.startTime;
-            return { kind:'rec', key, item, elapsed, urgency: elapsed / REC_SLA.red };
-        }).sort((a,b) => b.urgency - a.urgency);
+        // Update active badges
+        const piRecN=Object.keys(activeRecs).length, piPullN=Object.keys(activeWaves).length,
+              fgRecN=Object.keys(activeFgRecs).length, fgPullN=Object.keys(activeFgPulls).length;
+        document.getElementById('badge-inbound').innerText  = piRecN + fgRecN;
+        document.getElementById('badge-outbound').innerText = piPullN + fgPullN;
+        document.getElementById('in-active').innerText      = piRecN;
+        document.getElementById('out-active').innerText     = piPullN;
+        document.getElementById('fgin-active').innerText    = fgRecN;
+        document.getElementById('fgout-active').innerText   = fgPullN;
+        document.getElementById('sec-in-active').innerText  = piRecN;
+        document.getElementById('sec-out-active').innerText = piPullN;
+        document.getElementById('sec-fgin-active').innerText  = fgRecN;
+        document.getElementById('sec-fgout-active').innerText = fgPullN;
 
-        // build & sort outbound
-        const outItems = Object.keys(activeWaves).map(id => {
-            const item = activeWaves[id];
-            const tholds = PULL_SLA[item.type] || PULL_SLA.auto;
-            const elapsed = now - item.startTime;
-            return { kind:'wave', key: id, item, elapsed, urgency: elapsed / tholds.red };
-        }).sort((a,b) => b.urgency - a.urgency);
+        // empty states
+        document.getElementById('empty-inbound').style.display  = piRecN  ? 'none' : 'block';
+        document.getElementById('empty-outbound').style.display = piPullN ? 'none' : 'block';
+        document.getElementById('empty-fg-in').style.display    = fgRecN  ? 'none' : 'block';
+        document.getElementById('empty-fg-out').style.display   = fgPullN ? 'none' : 'block';
 
-        // badges & counts
-        document.getElementById('badge-inbound').innerText  = inItems.length;
-        document.getElementById('badge-outbound').innerText = outItems.length;
-        document.getElementById('in-active').innerText      = inItems.length;
-        document.getElementById('out-active').innerText     = outItems.length;
-        document.getElementById('sec-in-active').innerText  = inItems.length;
-        document.getElementById('sec-out-active').innerText = outItems.length;
+        // build each section's items sorted by urgency
+        const piRecItems  = Object.keys(activeRecs).map(key => { const item=activeRecs[key],   elapsed=now-item.startTime; return {kind:'rec',     key,item,elapsed,urgency:elapsed/PI_REC_SLA.red}; }).sort((a,b)=>b.urgency-a.urgency);
+        const piPullItems = Object.keys(activeWaves).map(id  => { const item=activeWaves[id],   elapsed=now-item.startTime, t=PI_PULL_SLA[item.type]||PI_PULL_SLA.auto; return {kind:'wave',    key:id,item,elapsed,urgency:elapsed/t.red}; }).sort((a,b)=>b.urgency-a.urgency);
+        const fgRecItems  = Object.keys(activeFgRecs).map(key => { const item=activeFgRecs[key],  elapsed=now-item.startTime; return {kind:'fg-rec',  key,item,elapsed,urgency:elapsed/FG_REC_SLA.red}; }).sort((a,b)=>b.urgency-a.urgency);
+        const fgPullItems = Object.keys(activeFgPulls).map(id  => { const item=activeFgPulls[id],  elapsed=now-item.startTime, t=FG_PULL_SLA[item.type]||FG_PULL_SLA.auto; return {kind:'fg-pull',key:id,item,elapsed,urgency:elapsed/t.red}; }).sort((a,b)=>b.urgency-a.urgency);
 
-        // empty messages
-        document.getElementById('empty-inbound').style.display  = inItems.length  ? 'none' : 'block';
-        document.getElementById('empty-outbound').style.display = outItems.length ? 'none' : 'block';
+        renderSection(piRecItems,  'grid-inbound');
+        renderSection(piPullItems, 'grid-outbound');
+        renderSection(fgRecItems,  'grid-fg-in');
+        renderSection(fgPullItems, 'grid-fg-out');
+    }
 
-        // shared render helper
-        function renderSection(items, gridId) {
-            const grid = document.getElementById(gridId);
+    function renderSection(items, gridId) {
+        const grid = document.getElementById(gridId);
+        grid.querySelectorAll('.dash-card').forEach(card => {
+            if (!items.some(x => x.kind+'|'+x.key === card.dataset.cardid)) card.remove();
+        });
 
-            // remove stale cards
-            grid.querySelectorAll('.dash-card').forEach(card => {
-                if (!items.some(x => x.kind+'|'+x.key === card.dataset.cardid)) card.remove();
-            });
+        items.forEach(({kind,key,item,elapsed}) => {
+            const tholds = kind==='rec' ? PI_REC_SLA : kind==='fg-rec' ? FG_REC_SLA : kind==='wave' ? (PI_PULL_SLA[item.type]||PI_PULL_SLA.auto) : (FG_PULL_SLA[item.type]||FG_PULL_SLA.auto);
 
-            items.forEach(({ kind, key, item, elapsed }) => {
-                const tholds = kind === 'rec' ? REC_SLA : (PULL_SLA[item.type] || PULL_SLA.auto);
+            let zoneColor;
+            if      (elapsed>=tholds.red)   zoneColor='hsl(0,   62%, 28%)';
+            else if (elapsed>=tholds.amber) zoneColor='hsl(42,  70%, 32%)';
+            else                            zoneColor='hsl(128, 55%, 28%)';
 
-                // colour zone
-                let zoneColor;
-                if      (elapsed >= tholds.red)   zoneColor = 'hsl(0,   62%, 28%)';
-                else if (elapsed >= tholds.amber) zoneColor = 'hsl(42,  70%, 32%)';
-                else                              zoneColor = 'hsl(128, 55%, 28%)';
+            const h=Math.floor(elapsed/3600000), m=Math.floor((elapsed%3600000)/60000), s=Math.floor((elapsed%60000)/1000);
+            const elapsed_str=`${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            const remain=tholds.true-elapsed, isOver=remain<0, absRem=Math.abs(remain);
+            const rh=Math.floor(absRem/3600000), rm=Math.floor((absRem%3600000)/60000);
+            const remain_str=(isOver?'-':'')+(rh>0?`${rh}:${rm.toString().padStart(2,'0')}`:`${rm}m`);
 
-                // timer strings
-                const h = Math.floor(elapsed / 3600000);
-                const m = Math.floor((elapsed % 3600000) / 60000);
-                const s = Math.floor((elapsed % 60000) / 1000);
-                const elapsed_str = `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            const slaLabels = {
+                'rec':     '5H SLA · ⚡2H · 🔴4H',
+                'wave':    item.type==='manual' ? '1H SLA · ⚡30M · 🔴45M' : '5H SLA · ⚡2H · 🔴4H',
+                'fg-rec':  '2H SLA · ⚡1H · 🔴1.5H',
+                'fg-pull': item.type==='manual' ? '1H SLA · ⚡30M · 🔴45M' : '5H SLA · ⚡2H · 🔴4H'
+            };
+            const accentClass  = {rec:'inbound',wave:'outbound','fg-rec':'fg-in','fg-pull':'fg-out'}[kind];
+            const typeLabel    = {rec:'▼ PI Receipt',wave:'▲ PI Pull','fg-rec':'▼ FG Receipt','fg-pull':'▲ FG Pull'}[kind];
+            const primaryVal   = kind==='rec' ? item.door : kind==='fg-rec' ? item.id : `#${item.id}`;
+            const chip1        = kind==='rec' ? item.trailer : kind==='fg-rec' ? (item.qty?`QTY: ${item.qty}`:'QTY: —') : (item.qty?`QTY: ${item.qty}`:'QTY: —');
+            const chip2        = kind==='rec' ? item.type : kind==='fg-rec' ? '' : (item.type==='manual'?'Manual':'Auto');
+            const bolLine      = (kind==='rec'&&item.bol) ? `<div style="font-size:13px;opacity:0.75;font-weight:600;margin-bottom:5px;">BOL: ${item.bol}</div>` : '';
+            const cardId       = `${kind}|${key}`;
 
-                // remaining string
-                const remain = tholds.true - elapsed;
-                const isOver = remain < 0;
-                const absRem = Math.abs(remain);
-                const rh     = Math.floor(absRem / 3600000);
-                const rm     = Math.floor((absRem % 3600000) / 60000);
-                const remain_str = (isOver ? '-' : '') + (rh > 0 ? `${rh}:${rm.toString().padStart(2,'0')}` : `${rm}m`);
+            const closeCall  = {rec:`initiateCloseRecByKey('${key}')`,wave:`initiateCloseWaveById('${key}')`,
+                                'fg-rec':`initiateCloseFgRecByKey('${key}')`,
+                                'fg-pull':`initiateCloseFgPullById('${key}')`}[kind];
+            const selectFn = () => {
+                document.querySelectorAll('.dash-card').forEach(c=>c.classList.remove('selected-card'));
+                if (kind==='rec')     { document.getElementById('in-trailer').value=item.trailer; document.getElementById('in-door').value=item.door; setMode('pi-rec'); }
+                else if (kind==='wave') { document.getElementById('out-id').value=key; setMode('pi-pull'); }
+                else if (kind==='fg-rec') { document.getElementById('fgin-po').value=item.id; setMode('fg-rec'); }
+                else { document.getElementById('fgout-id').value=key; setMode('fg-pull'); }
+            };
 
-                const slaLabel   = kind === 'rec' ? '5H SLA · ⚡2H · 🔴4H' : (item.type === 'manual' ? '1H SLA · ⚡30M · 🔴45M' : '5H SLA · ⚡2H · 🔴4H');
-                const cardId     = `${kind}|${key}`;
-                let card = grid.querySelector(`.dash-card[data-cardid="${CSS.escape(cardId)}"]`);
-
-                if (!card) {
-                    card = document.createElement('div');
-                    card.className      = 'dash-card card-enter';
-                    card.dataset.kind   = kind;
-                    card.dataset.key    = key;
-                    card.dataset.cardid = cardId;
-                    // remove entry animation class once it finishes so it can't conflict with glow
-                    card.addEventListener('animationend', () => card.classList.remove('card-enter'), { once: true });
-
-                    const accentClass = kind === 'rec' ? 'inbound' : 'outbound';
-                    const primaryVal  = kind === 'rec' ? item.door : `#${item.id}`;
-                    const chip1       = kind === 'rec' ? item.trailer : (item.qty ? `QTY: ${item.qty}` : 'QTY: —');
-                    const chip2       = kind === 'rec' ? item.type    : (item.type === 'manual' ? 'Manual' : 'Auto');
-                    const bolLine     = (kind === 'rec' && item.bol)
-                        ? `<div style="font-size:13px;opacity:0.65;font-weight:600;margin-bottom:5px;">BOL: ${item.bol}</div>` : '';
-                    const closeCall   = kind === 'rec' ? `initiateCloseRecByKey('${key}')` : `initiateCloseWaveById('${key}')`;
-                    const selectCall  = kind === 'rec'
-                        ? `document.getElementById('in-trailer').value='${item.trailer}';document.getElementById('in-door').value='${item.door}';setMode('inbound');`
-                        : `document.getElementById('out-id').value='${key}';setMode('outbound');`;
-
-                    card.innerHTML = `
-                        <div class="card-accent ${accentClass}"></div>
-                        <div class="card-body">
-                            <button class="card-close-btn" onclick="${closeCall}">✕</button>
-                            <div class="card-header">
-                                <div class="card-type-label ${accentClass}">${kind === 'rec' ? '▼ Inbound Receipt' : '▲ Outbound Pull'}</div>
-                                <div class="sla-tag">${slaLabel}</div>
-                            </div>
-                            <div class="id-val">${primaryVal}</div>
-                            <div class="info-row">
-                                <div class="info-chip">${chip1}</div>
-                                <span class="sub-chip">${chip2}</span>
-                            </div>
-                            ${bolLine}
-                            <div class="card-footer">
-                                <div class="timer-block">
-                                    <div class="timer-label">Elapsed</div>
-                                    <div class="timer-val" data-elapsed></div>
-                                </div>
-                                <div class="remaining-block">
-                                    <div class="remaining-label" data-rem-label></div>
-                                    <div class="remaining-val" data-rem-val></div>
-                                </div>
-                            </div>
+            let card = grid.querySelector(`.dash-card[data-cardid="${CSS.escape(cardId)}"]`);
+            if (!card) {
+                card = document.createElement('div');
+                card.className='dash-card'; card.dataset.kind=kind; card.dataset.key=key; card.dataset.cardid=cardId;
+                card.innerHTML=`
+                    <div class="card-accent ${accentClass}"></div>
+                    <div class="card-body">
+                        <button class="card-close-btn" onclick="${closeCall}">✕</button>
+                        <div class="card-header">
+                            <div class="card-type-label ${accentClass}">${typeLabel}</div>
+                            <div class="sla-tag">${slaLabels[kind]}</div>
                         </div>
-                    `;
+                        <div class="id-val">${primaryVal}</div>
+                        <div class="info-row">
+                            <div class="info-chip">${chip1}</div>
+                            ${chip2?`<span class="sub-chip">${chip2}</span>`:''}
+                        </div>
+                        ${bolLine}
+                        <div class="card-footer">
+                            <div class="timer-block"><div class="timer-label">Elapsed</div><div class="timer-val" data-elapsed></div></div>
+                            <div class="remaining-block"><div class="remaining-label" data-rem-label></div><div class="remaining-val" data-rem-val></div></div>
+                        </div>
+                    </div>`;
+                card.onclick = e => { if(e.target.classList.contains('card-close-btn'))return; card.classList.add('selected-card'); selectFn(); };
+                grid.appendChild(card);
+            }
 
-                    card.onclick = (e) => {
-                        if (e.target.classList.contains('card-close-btn')) return;
-                        document.querySelectorAll('.dash-card').forEach(c => c.classList.remove('selected-card'));
-                        card.classList.add('selected-card');
-                        eval(selectCall);
-                    };
+            card.querySelector('[data-elapsed]').innerText   = elapsed_str;
+            card.querySelector('[data-rem-label]').innerText = isOver?'Overdue':'Remaining';
+            const remEl=card.querySelector('[data-rem-val]'); remEl.innerText=remain_str; remEl.className='remaining-val'+(isOver?' overdue':'');
+            if (card.style.backgroundColor!==zoneColor) card.style.backgroundColor=zoneColor;
 
-                    grid.appendChild(card);
-                }
+            const needsRed=elapsed>=tholds.red, needsAmber=!needsRed&&elapsed>=tholds.amber;
+            if (needsRed&&!card.classList.contains('warning-red'))   { card.classList.remove('warning-amber'); card.classList.add('warning-red'); }
+            else if (needsAmber&&!card.classList.contains('warning-amber')) { card.classList.remove('warning-red'); card.classList.add('warning-amber'); }
+            else if (!needsRed&&!needsAmber) { card.classList.remove('warning-red','warning-amber'); }
+        });
 
-                // update dynamic parts only
-                card.querySelector('[data-elapsed]').innerText   = elapsed_str;
-                card.querySelector('[data-rem-label]').innerText = isOver ? 'Overdue' : 'Remaining';
-                const remEl = card.querySelector('[data-rem-val]');
-                remEl.innerText = remain_str;
-                remEl.className = 'remaining-val' + (isOver ? ' overdue' : '');
-
-                if (card.style.backgroundColor !== zoneColor) card.style.backgroundColor = zoneColor;
-
-                // glow classes — CSS-only, won't be disrupted by render updates
-                const needsRed   = elapsed >= tholds.red;
-                const needsAmber = !needsRed && elapsed >= tholds.amber;
-                if (needsRed && !card.classList.contains('warning-red')) {
-                    card.classList.remove('warning-amber');
-                    card.classList.add('warning-red');
-                } else if (needsAmber && !card.classList.contains('warning-amber')) {
-                    card.classList.remove('warning-red');
-                    card.classList.add('warning-amber');
-                } else if (!needsRed && !needsAmber) {
-                    card.classList.remove('warning-red', 'warning-amber');
-                }
-            });
-
-            // re-sort DOM order within grid to match urgency
-            [...grid.querySelectorAll('.dash-card')]
-                .sort((a,b) => {
-                    const ai = items.findIndex(x => x.kind+'|'+x.key === a.dataset.cardid);
-                    const bi = items.findIndex(x => x.kind+'|'+x.key === b.dataset.cardid);
-                    return ai - bi;
-                })
-                .forEach(card => grid.appendChild(card));
-        }
-
-        renderSection(inItems,  'grid-inbound');
-        renderSection(outItems, 'grid-outbound');
+        [...grid.querySelectorAll('.dash-card')].sort((a,b)=>{
+            const ai=items.findIndex(x=>x.kind+'|'+x.key===a.dataset.cardid), bi=items.findIndex(x=>x.kind+'|'+x.key===b.dataset.cardid);
+            return ai-bi;
+        }).forEach(c=>grid.appendChild(c));
     }
 
     // ── LOG OVERLAYS ────────────────────────────────────────
@@ -1645,81 +1700,62 @@
         overlay.classList.toggle('visible');
         if (!overlay.classList.contains('visible')) return;
 
-        const bodyId = `log-${which}-body`;
-        const cols   = which === 'inbound' ? 7 : 6;
-        document.getElementById(bodyId).innerHTML =
-            `<tr><td colspan="${cols}" style="text-align:center;color:var(--muted);">Loading...</td></tr>`;
-
+        const configs = {
+            inbound:  { api:REC_API,     bodyId:'log-inbound-body',   cols:7, isRec:true },
+            outbound: { api:PULL_API,    bodyId:'log-outbound-body',  cols:6, isWave:true },
+            'fg-rec': { api:FG_REC_API,  bodyId:'log-fg-rec-body',    cols:5, isFgRec:true },
+            'fg-pull':{ api:FG_PULL_API, bodyId:'log-fg-pull-body',   cols:6, isWave:true }
+        };
+        const cfg = configs[which];
+        document.getElementById(cfg.bodyId).innerHTML = `<tr><td colspan="${cfg.cols}" style="text-align:center;color:var(--muted);">Loading...</td></tr>`;
         try {
-            const api = which === 'inbound' ? REC_API : PULL_API;
-            const res = await fetch(`${api}?action=GET_LOG&t=${Date.now()}`);
-            const data = await res.json();
-            const logs = data.slice(1).reverse();
-
-            if (!logs.length) {
-                document.getElementById(bodyId).innerHTML =
-                    `<tr><td colspan="${cols}" style="text-align:center;color:var(--muted);">No archived records found.</td></tr>`;
-                return;
-            }
-
-            document.getElementById(bodyId).innerHTML = logs.map(row => {
-                if (which === 'inbound') {
-                    let st = row[4]; if (!isNaN(st) && st !== '') st = new Date(Number(st)).toLocaleString();
-                    let et = row[5]; if (!isNaN(et) && et !== '') et = new Date(Number(et)).toLocaleString();
-                    return `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${row[3]}</td><td>${st}</td><td>${et}</td><td>${row[6]}</td></tr>`;
-                } else {
-                    let st = row[3]; if (!isNaN(st) && st !== '') st = new Date(Number(st)).toLocaleString();
-                    let et = row[4]; if (!isNaN(et) && et !== '') et = new Date(Number(et)).toLocaleString();
-                    return `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td><td>${st}</td><td>${et}</td><td>${row[5]}</td></tr>`;
-                }
+            const rows = (await (await fetch(`${cfg.api}?action=GET_LOG&t=${Date.now()}`)).json()).slice(1).reverse();
+            if (!rows.length) { document.getElementById(cfg.bodyId).innerHTML=`<tr><td colspan="${cfg.cols}" style="text-align:center;color:var(--muted);">No archived records found.</td></tr>`; return; }
+            document.getElementById(cfg.bodyId).innerHTML = rows.map(row => {
+                const fmtTs = i => { const ts=row[i]; return (!isNaN(ts)&&ts!=='') ? new Date(Number(ts)).toLocaleString() : (ts||'—'); };
+                if (cfg.isRec)
+                    // PI Receipt: Door, Trailer, BOL, Type, Started, Ended, Duration
+                    return `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]||'—'}</td><td>${row[3]}</td><td>${fmtTs(4)}</td><td>${fmtTs(5)}</td><td>${row[6]}</td></tr>`;
+                if (cfg.isFgRec)
+                    // FG Receipt archive: PO/DN(0), Qty(1), Started(2), Ended(3), Duration(4)
+                    return `<tr><td>${row[0]}</td><td>${row[1]||'—'}</td><td>${fmtTs(2)}</td><td>${fmtTs(3)}</td><td>${row[4]}</td></tr>`;
+                // PI Pull / FG Pull: id, type, qty, startTime, endTime, duration
+                return `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]||'—'}</td><td>${fmtTs(3)}</td><td>${fmtTs(4)}</td><td>${row[5]}</td></tr>`;
             }).join('');
-        } catch {
-            document.getElementById(bodyId).innerHTML =
-                `<tr><td colspan="${cols}">Error loading log.</td></tr>`;
-        }
+        } catch { document.getElementById(cfg.bodyId).innerHTML=`<tr><td colspan="${cfg.cols}">Error loading log.</td></tr>`; }
     }
 
     // ── EXPORT CSV ─────────────────────────────────────────
     async function exportCSV(which) {
+        const apis = { inbound:REC_API, outbound:PULL_API, 'fg-rec':FG_REC_API, 'fg-pull':FG_PULL_API };
+        const headers = {
+            inbound:  ['Door','Trailer','BOL','Type','Started','Ended','Duration'],
+            outbound: ['Wave ID','Type','Qty','Started','Completed','Duration'],
+            'fg-rec': ['PO/DN','Qty','Started','Ended','Duration'],
+            'fg-pull':['Pull ID','Type','Qty','Started','Completed','Duration']
+        };
+        const dateIdxs = { inbound:[4,5], outbound:[3,4], 'fg-rec':[2,3], 'fg-pull':[3,4] };
         try {
-            const api  = which === 'inbound' ? REC_API : PULL_API;
-            const res  = await fetch(`${api}?action=GET_LOG&t=${Date.now()}`);
-            const data = await res.json();
-            const rows = data.slice(1).reverse();
-
-            let header, csvRows;
-            if (which === 'inbound') {
-                header = ['Door','Trailer','BOL','Type','Started','Ended','Duration'];
-                csvRows = [header, ...rows.map(row => {
-                    let st = row[4]; if (!isNaN(st) && st !== '') st = new Date(Number(st)).toLocaleString();
-                    let et = row[5]; if (!isNaN(et) && et !== '') et = new Date(Number(et)).toLocaleString();
-                    return [row[0], row[1], row[2], row[3], st, et, row[6]];
-                })];
-            } else {
-                header = ['Wave ID','Type','Qty','Started','Completed','Duration'];
-                csvRows = [header, ...rows.map(row => {
-                    let st = row[3]; if (!isNaN(st) && st !== '') st = new Date(Number(st)).toLocaleString();
-                    let et = row[4]; if (!isNaN(et) && et !== '') et = new Date(Number(et)).toLocaleString();
-                    return [row[0], row[1], row[2], st, et, row[5]];
-                })];
-            }
-
-            const csv  = csvRows.map(r => r.map(c => `"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url  = URL.createObjectURL(blob);
-            const a    = document.createElement('a');
-            a.href     = url;
-            a.download = `${which}-log-${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
+            const rows=(await (await fetch(`${apis[which]}?action=GET_LOG&t=${Date.now()}`)).json()).slice(1).reverse();
+            const dIdx=dateIdxs[which];
+            const csvRows=[headers[which],...rows.map(row=>{
+                const r=[...row];
+                dIdx.forEach(i=>{ if(!isNaN(r[i])&&r[i]!=='') r[i]=new Date(Number(r[i])).toLocaleString(); });
+                return r;
+            })];
+            const csv=csvRows.map(r=>r.map(c=>`"${String(c??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+            const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+            a.download=`${which}-log-${new Date().toISOString().slice(0,10)}.csv`; a.click();
         } catch { alert('Failed to export. Please try again.'); }
     }
 
     // ── ANALYTICS ───────────────────────────────────────────
-    let analyticsRange   = '7d';
-    let analyticsCharts  = {};
-    let inLogCache       = null;
-    let outLogCache      = null;
+    let analyticsRange  = '7d';
+    let analyticsCharts = {};
+    let inLogCache      = null;
+    let outLogCache     = null;
+    let fgInLogCache    = null;
+    let fgOutLogCache   = null;
 
     const CHART_DEFAULTS = {
         responsive: true,
@@ -1745,294 +1781,221 @@
     }
 
     async function loadAnalytics() {
-        // fetch both logs (use cache to avoid hammering the API on range switch)
-        try {
-            if (!inLogCache) {
-                const r = await fetch(`${REC_API}?action=GET_LOG&t=${Date.now()}`);
-                const d = await r.json(); inLogCache = d.slice(1);
-            }
-        } catch { inLogCache = []; }
+        try { if (!inLogCache)   { const r=await fetch(`${REC_API}?action=GET_LOG&t=${Date.now()}`);    const d=await r.json(); inLogCache   = d.slice(1); } } catch { inLogCache   = []; }
+        try { if (!outLogCache)  { const r=await fetch(`${PULL_API}?action=GET_LOG&t=${Date.now()}`);   const d=await r.json(); outLogCache  = d.slice(1); } } catch { outLogCache  = []; }
+        try { if (!fgInLogCache) { const r=await fetch(`${FG_REC_API}?action=GET_LOG&t=${Date.now()}`); const d=await r.json(); fgInLogCache = d.slice(1); } } catch { fgInLogCache = []; }
+        try { if (!fgOutLogCache){ const r=await fetch(`${FG_PULL_API}?action=GET_LOG&t=${Date.now()}`);const d=await r.json(); fgOutLogCache= d.slice(1); } } catch { fgOutLogCache= []; }
 
-        try {
-            if (!outLogCache) {
-                const r = await fetch(`${PULL_API}?action=GET_LOG&t=${Date.now()}`);
-                const d = await r.json(); outLogCache = d.slice(1);
-            }
-        } catch { outLogCache = []; }
+        // PI Receipt archive: Door(0),Trailer(1),BOL(2),Type(3),Started(4),Ended(5),Duration(6) — endTime=r[5]
+        // PI Pull archive:    ID(0),Type(1),Qty(2),StartTime(3),EndTime(4),Duration(5)          — endTime=r[4]
+        // FG Receipt archive: PO/DN(0),Qty(1),Started(2),Ended(3),Duration(4)                  — endTime=r[3]
+        // FG Pull archive:    ID(0),Type(1),Qty(2),StartTime(3),EndTime(4),Duration(5)          — endTime=r[4]
+        const inRows     = filterByRange(inLogCache,    r => Number(r[5]));
+        const outRows    = filterByRange(outLogCache,   r => Number(r[4]));
+        const fgInRows   = filterByRange(fgInLogCache,  r => Number(r[3]));
+        const fgOutRows  = filterByRange(fgOutLogCache, r => Number(r[4]));
 
-        const inRows  = filterByRange(inLogCache,  r => Number(r[5]));
-        const outRows = filterByRange(outLogCache, r => Number(r[4]));
-
-        drawKPIs(inRows, outRows);
-        drawVolumeCharts(inRows, outRows);
-        drawAvgCharts(inRows, outRows);
-        drawSLACharts(inRows, outRows);
-        drawTypeCharts(inRows, outRows);
-        drawHourCharts(inRows, outRows);
+        drawKPIs(inRows, outRows, fgInRows, fgOutRows);
+        drawVolumeCharts(inRows, outRows, fgInRows, fgOutRows);
+        drawAvgCharts(inRows, outRows, fgInRows, fgOutRows);
+        drawSLACharts(inRows, outRows, fgInRows, fgOutRows);
+        drawTypeCharts(inRows, outRows, fgInRows, fgOutRows);
+        drawHourCharts(inRows, outRows, fgInRows, fgOutRows);
     }
 
-    // force re-fetch on next open so new records are picked up
-    function invalidateAnalyticsCache() { inLogCache = null; outLogCache = null; }
+    function invalidateAnalyticsCache() { inLogCache=null; outLogCache=null; fgInLogCache=null; fgOutLogCache=null; }
 
     function filterByRange(rows, getTs) {
-        const now   = Date.now();
-        const today = new Date(); today.setHours(0,0,0,0);
-        const cuts  = { today: today.getTime(), '7d': now - 7*864e5, '30d': now - 30*864e5, all: 0 };
-        const cut   = cuts[analyticsRange] || 0;
-        return rows.filter(r => { const ts = getTs(r); return !isNaN(ts) && ts >= cut; });
+        const now=Date.now(), today=new Date(); today.setHours(0,0,0,0);
+        const cuts={ today:today.getTime(), '7d':now-7*864e5, '30d':now-30*864e5, all:0 };
+        const cut=cuts[analyticsRange]||0;
+        return rows.filter(r=>{ const ts=getTs(r); return !isNaN(ts)&&ts>=cut; });
     }
 
-    function msToHrs(ms) { return Math.round(ms / 36000) / 100; }
-    function minsToHrs(m) { return Math.round(m * 100 / 60) / 100; }
+    function minsToHrs(m) { return Math.round(m*100/60)/100; }
 
     function groupByDay(rows, getTs) {
-        const map = {};
-        rows.forEach(r => {
-            const ts = getTs(r);
-            if (isNaN(ts)) return;
-            const d = new Date(ts);
-            const key = `${d.getMonth()+1}/${d.getDate()}`;
-            map[key] = (map[key] || 0) + 1;
-        });
+        const map={};
+        rows.forEach(r=>{ const ts=getTs(r); if(isNaN(ts))return; const d=new Date(ts), k=`${d.getMonth()+1}/${d.getDate()}`; map[k]=(map[k]||0)+1; });
         return map;
     }
 
-    function getDayLabels(rows, getTs) {
-        const keys = Object.keys(groupByDay(rows, getTs));
-        return keys.sort((a,b) => new Date(a+'/2000') - new Date(b+'/2000'));
+    function makeChart(id, type, data, extraOpts={}) {
+        const canvas=document.getElementById(id); if(!canvas)return;
+        if(analyticsCharts[id]) analyticsCharts[id].destroy();
+        analyticsCharts[id]=new Chart(canvas,{type,data,options:deepMerge(JSON.parse(JSON.stringify(CHART_DEFAULTS)),extraOpts)});
     }
 
-    function makeChart(id, type, data, extraOpts = {}) {
-        const canvas = document.getElementById(id);
-        if (!canvas) return;
-        if (analyticsCharts[id]) analyticsCharts[id].destroy();
-        analyticsCharts[id] = new Chart(canvas, {
-            type,
-            data,
-            options: deepMerge(JSON.parse(JSON.stringify(CHART_DEFAULTS)), extraOpts)
-        });
-    }
-
-    function deepMerge(target, source) {
-        for (const k in source) {
-            if (source[k] && typeof source[k] === 'object' && !Array.isArray(source[k])) {
-                target[k] = target[k] || {};
-                deepMerge(target[k], source[k]);
-            } else { target[k] = source[k]; }
-        }
-        return target;
-    }
+    function deepMerge(target,source){ for(const k in source){ if(source[k]&&typeof source[k]==='object'&&!Array.isArray(source[k])){ target[k]=target[k]||{}; deepMerge(target[k],source[k]); } else { target[k]=source[k]; } } return target; }
 
     // ── KPIs ────────────────────────────────────────────────
-    function drawKPIs(inRows, outRows) {
-        const inAvgMin  = avgMins(inRows.map(r => parseDuration(r[6])));
-        const inSla     = slaRate(inRows, r => parseDuration(r[6]), 300); // 5h = 300m
-        const autoRows  = outRows.filter(r => r[1]==='auto');
-        const manRows   = outRows.filter(r => r[1]==='manual');
-        const autoAvg   = avgMins(autoRows.map(r => parseDuration(r[5])));
-        const manAvg    = avgMins(manRows.map(r => parseDuration(r[5])));
-        const autoSla   = slaRate(autoRows,  r => parseDuration(r[5]), 300); // 5h
-        const manSla    = slaRate(manRows,   r => parseDuration(r[5]),  60); // 1h
+    function drawKPIs(inRows, outRows, fgInRows, fgOutRows) {
+        const colorSla = id => { const el=document.getElementById(id), v=parseInt(el.innerText); el.className='kpi-val '+(isNaN(v)?'success':v>=90?'success':v>=70?'warning':'danger'); };
 
-        document.getElementById('kpi-in-total').innerText       = inRows.length;
-        document.getElementById('kpi-in-avg').innerText         = inAvgMin  ? fmtAvg(inAvgMin)  : '—';
-        document.getElementById('kpi-in-sla').innerText         = inSla     !== null ? inSla+'%'  : '—';
+        // PI Receipt — duration col 6, SLA 300m (5h)
+        const inAvg = avgMins(inRows.map(r=>parseDuration(r[6])));
+        const inSla = slaRate(inRows, r=>parseDuration(r[6]), 300);
+        document.getElementById('kpi-in-total').innerText = inRows.length;
+        document.getElementById('kpi-in-avg').innerText   = inAvg ? fmtAvg(inAvg) : '—';
+        document.getElementById('kpi-in-sla').innerText   = inSla!==null ? inSla+'%' : '—';
+        colorSla('kpi-in-sla');
+
+        // PI Pull — duration col 5, type col 1
+        const autoOut=outRows.filter(r=>r[1]==='auto'), manOut=outRows.filter(r=>r[1]==='manual');
+        const autoAvg=avgMins(autoOut.map(r=>parseDuration(r[5]))), manAvg=avgMins(manOut.map(r=>parseDuration(r[5])));
+        const autoSla=slaRate(autoOut,r=>parseDuration(r[5]),300), manSla=slaRate(manOut,r=>parseDuration(r[5]),60);
         document.getElementById('kpi-out-total').innerText      = outRows.length;
-        document.getElementById('kpi-out-avg-auto').innerText   = autoAvg   ? fmtAvg(autoAvg)   : '—';
-        document.getElementById('kpi-out-avg-manual').innerText = manAvg    ? fmtAvg(manAvg)    : '—';
-        document.getElementById('kpi-out-sla-auto').innerText   = autoSla   !== null ? autoSla+'%'  : '—';
-        document.getElementById('kpi-out-sla-manual').innerText = manSla    !== null ? manSla+'%'   : '—';
+        document.getElementById('kpi-out-avg-auto').innerText   = autoAvg ? fmtAvg(autoAvg) : '—';
+        document.getElementById('kpi-out-avg-manual').innerText = manAvg  ? fmtAvg(manAvg)  : '—';
+        document.getElementById('kpi-out-sla-auto').innerText   = autoSla!==null ? autoSla+'%' : '—';
+        document.getElementById('kpi-out-sla-manual').innerText = manSla!==null  ? manSla+'%'  : '—';
+        colorSla('kpi-out-sla-auto'); colorSla('kpi-out-sla-manual');
 
-        // color KPI SLA values
-        ['kpi-in-sla','kpi-out-sla-auto','kpi-out-sla-manual'].forEach(id => {
-            const el = document.getElementById(id);
-            const v  = parseInt(el.innerText);
-            el.className = 'kpi-val ' + (isNaN(v) ? 'success' : v >= 90 ? 'success' : v >= 70 ? 'warning' : 'danger');
-        });
+        // FG Receipt — duration col 4, SLA 120m (2h)
+        const fgInAvg=avgMins(fgInRows.map(r=>parseDuration(r[4])));
+        const fgInSla=slaRate(fgInRows, r=>parseDuration(r[4]), 120);
+        document.getElementById('kpi-fgin-total').innerText = fgInRows.length;
+        document.getElementById('kpi-fgin-avg').innerText   = fgInAvg ? fmtAvg(fgInAvg) : '—';
+        document.getElementById('kpi-fgin-sla').innerText   = fgInSla!==null ? fgInSla+'%' : '—';
+        colorSla('kpi-fgin-sla');
+
+        // FG Pull — duration col 5, type col 1
+        const autoFg=fgOutRows.filter(r=>r[1]==='auto'), manFg=fgOutRows.filter(r=>r[1]==='manual');
+        const autoFgAvg=avgMins(autoFg.map(r=>parseDuration(r[5]))), manFgAvg=avgMins(manFg.map(r=>parseDuration(r[5])));
+        const autoFgSla=slaRate(autoFg,r=>parseDuration(r[5]),300), manFgSla=slaRate(manFg,r=>parseDuration(r[5]),60);
+        document.getElementById('kpi-fgout-total').innerText      = fgOutRows.length;
+        document.getElementById('kpi-fgout-avg-auto').innerText   = autoFgAvg ? fmtAvg(autoFgAvg) : '—';
+        document.getElementById('kpi-fgout-avg-manual').innerText = manFgAvg  ? fmtAvg(manFgAvg)  : '—';
+        document.getElementById('kpi-fgout-sla-auto').innerText   = autoFgSla!==null ? autoFgSla+'%' : '—';
+        document.getElementById('kpi-fgout-sla-manual').innerText = manFgSla!==null  ? manFgSla+'%'  : '—';
+        colorSla('kpi-fgout-sla-auto'); colorSla('kpi-fgout-sla-manual');
     }
 
-    function avgMins(arr) {
-        const f = arr.filter(d => d > 0);
-        return f.length ? Math.round(f.reduce((a,b)=>a+b,0)/f.length) : null;
-    }
-
-    function slaRate(rows, getDur, limitMin) {
-        if (!rows.length) return null;
-        const met = rows.filter(r => { const d = getDur(r); return d > 0 && d <= limitMin; }).length;
-        return Math.round(met / rows.length * 100);
-    }
+    function avgMins(arr) { const f=arr.filter(d=>d>0); return f.length?Math.round(f.reduce((a,b)=>a+b,0)/f.length):null; }
+    function slaRate(rows,getDur,limitMin){ if(!rows.length)return null; const met=rows.filter(r=>{const d=getDur(r);return d>0&&d<=limitMin;}).length; return Math.round(met/rows.length*100); }
 
     // ── VOLUME CHARTS ────────────────────────────────────────
-    function drawVolumeCharts(inRows, outRows) {
-        const inDays  = groupByDay(inRows,  r => Number(r[5]));
-        const outDays = groupByDay(outRows, r => Number(r[4]));
-        const inLabels  = Object.keys(inDays).sort();
-        const outLabels = Object.keys(outDays).sort();
+    function drawVolumeCharts(inRows, outRows, fgInRows, fgOutRows) {
+        const mkBar = (id, rows, getTs, color, label) => {
+            const days=groupByDay(rows,getTs), labels=Object.keys(days).sort();
+            makeChart(id,'bar',{labels,datasets:[{label,data:labels.map(d=>days[d]),backgroundColor:`${color}b3`,borderColor:color,borderWidth:1,borderRadius:4}]},{plugins:{legend:{display:false}}});
+        };
+        mkBar('chart-in-volume',    inRows,    r=>Number(r[5]), '#e1261c', 'Receipts');
+        mkBar('chart-fgin-volume',  fgInRows,  r=>Number(r[3]), '#22c55e', 'FG Receipts');
 
-        makeChart('chart-in-volume', 'bar', {
-            labels: inLabels,
-            datasets: [{ label: 'Receipts', data: inLabels.map(d => inDays[d]),
-                backgroundColor: 'rgba(225,38,28,0.7)', borderColor: '#e1261c', borderWidth: 1, borderRadius: 4 }]
-        }, { plugins: { legend: { display: false } } });
+        // PI Pulls — split auto/manual
+        const outDays=groupByDay(outRows,r=>Number(r[4])), outLabels=Object.keys(outDays).sort();
+        makeChart('chart-out-volume','bar',{labels:outLabels,datasets:[
+            {label:'Auto',  data:outLabels.map(d=>groupByDay(outRows.filter(r=>r[1]==='auto'),  r=>Number(r[4]))[d]||0),backgroundColor:'rgba(74,144,217,0.7)',borderColor:'#4a90d9',borderWidth:1,borderRadius:4},
+            {label:'Manual',data:outLabels.map(d=>groupByDay(outRows.filter(r=>r[1]==='manual'),r=>Number(r[4]))[d]||0),backgroundColor:'rgba(74,144,217,0.3)',borderColor:'#4a90d9',borderWidth:1,borderRadius:4}
+        ]});
 
-        makeChart('chart-out-volume', 'bar', {
-            labels: outLabels,
-            datasets: [
-                { label: 'Auto',   data: outLabels.map(d => groupByDay(outRows.filter(r=>r[1]==='auto'),   r=>Number(r[4]))[d] || 0),
-                  backgroundColor: 'rgba(74,144,217,0.7)', borderColor: '#4a90d9', borderWidth: 1, borderRadius: 4 },
-                { label: 'Manual', data: outLabels.map(d => groupByDay(outRows.filter(r=>r[1]==='manual'), r=>Number(r[4]))[d] || 0),
-                  backgroundColor: 'rgba(74,144,217,0.3)', borderColor: '#4a90d9', borderWidth: 1, borderRadius: 4 }
-            ]
-        });
+        // FG Pulls — split auto/manual
+        const fgDays=groupByDay(fgOutRows,r=>Number(r[4])), fgLabels=Object.keys(fgDays).sort();
+        makeChart('chart-fgout-volume','bar',{labels:fgLabels,datasets:[
+            {label:'Auto',  data:fgLabels.map(d=>groupByDay(fgOutRows.filter(r=>r[1]==='auto'),  r=>Number(r[4]))[d]||0),backgroundColor:'rgba(168,85,247,0.7)',borderColor:'#a855f7',borderWidth:1,borderRadius:4},
+            {label:'Manual',data:fgLabels.map(d=>groupByDay(fgOutRows.filter(r=>r[1]==='manual'),r=>Number(r[4]))[d]||0),backgroundColor:'rgba(168,85,247,0.3)',borderColor:'#a855f7',borderWidth:1,borderRadius:4}
+        ]});
     }
 
-    // ── AVG DURATION CHARTS ──────────────────────────────────
-    function drawAvgCharts(inRows, outRows) {
-        function avgByDay(rows, getTs, getDur) {
-            const map = {};
-            rows.forEach(r => {
-                const ts = getTs(r); if (isNaN(ts)) return;
-                const d  = new Date(ts);
-                const k  = `${d.getMonth()+1}/${d.getDate()}`;
-                if (!map[k]) map[k] = [];
-                const dur = getDur(r); if (dur > 0) map[k].push(dur);
-            });
-            return map;
-        }
+    // ── AVG CHARTS ───────────────────────────────────────────
+    function drawAvgCharts(inRows, outRows, fgInRows, fgOutRows) {
+        function avgByDay(rows,getTs,getDur){ const map={}; rows.forEach(r=>{ const ts=getTs(r); if(isNaN(ts))return; const k=`${new Date(ts).getMonth()+1}/${new Date(ts).getDate()}`; if(!map[k])map[k]=[]; const dur=getDur(r); if(dur>0)map[k].push(dur); }); return map; }
 
-        const inMap   = avgByDay(inRows, r=>Number(r[5]), r=>parseDuration(r[6]));
-        const inLabels = Object.keys(inMap).sort();
-        makeChart('chart-in-avg', 'line', {
-            labels: inLabels,
-            datasets: [{ label: 'Avg Hrs', data: inLabels.map(d => {
-                const a = avgMins(inMap[d]); return a ? minsToHrs(a) : null;
-            }), borderColor: '#e1261c', backgroundColor: 'rgba(225,38,28,0.1)',
-                tension: 0.3, fill: true, pointRadius: 4, pointBackgroundColor: '#e1261c' }]
-        }, { plugins: { legend: { display: false } } });
+        // PI Receipt
+        const inMap=avgByDay(inRows,r=>Number(r[5]),r=>parseDuration(r[6])), inLabels=Object.keys(inMap).sort();
+        makeChart('chart-in-avg','line',{labels:inLabels,datasets:[{label:'Avg Hrs',data:inLabels.map(d=>{const a=avgMins(inMap[d]);return a?minsToHrs(a):null;}),borderColor:'#e1261c',backgroundColor:'rgba(225,38,28,0.1)',tension:0.3,fill:true,pointRadius:4,pointBackgroundColor:'#e1261c'}]},{plugins:{legend:{display:false}}});
 
-        const autoMap   = avgByDay(outRows.filter(r=>r[1]==='auto'),   r=>Number(r[4]), r=>parseDuration(r[5]));
-        const manMap    = avgByDay(outRows.filter(r=>r[1]==='manual'), r=>Number(r[4]), r=>parseDuration(r[5]));
-        const allDays   = [...new Set([...Object.keys(autoMap), ...Object.keys(manMap)])].sort();
-        makeChart('chart-out-avg', 'line', {
-            labels: allDays,
-            datasets: [
-                { label: 'Auto Avg Hrs', data: allDays.map(d => { const a = avgMins(autoMap[d]||[]); return a ? minsToHrs(a) : null; }),
-                  borderColor: '#4a90d9', backgroundColor: 'rgba(74,144,217,0.1)', tension: 0.3, fill: false, pointRadius: 4, pointBackgroundColor: '#4a90d9' },
-                { label: 'Manual Avg Hrs', data: allDays.map(d => { const a = avgMins(manMap[d]||[]); return a ? minsToHrs(a) : null; }),
-                  borderColor: '#7ab8e8', backgroundColor: 'rgba(122,184,232,0.1)', tension: 0.3, fill: false, pointRadius: 4, pointBackgroundColor: '#7ab8e8', borderDash: [5,3] }
-            ]
-        });
+        // PI Pull
+        const autoMap=avgByDay(outRows.filter(r=>r[1]==='auto'),  r=>Number(r[4]),r=>parseDuration(r[5]));
+        const manMap =avgByDay(outRows.filter(r=>r[1]==='manual'),r=>Number(r[4]),r=>parseDuration(r[5]));
+        const allOut=[...new Set([...Object.keys(autoMap),...Object.keys(manMap)])].sort();
+        makeChart('chart-out-avg','line',{labels:allOut,datasets:[
+            {label:'Auto',  data:allOut.map(d=>{const a=avgMins(autoMap[d]||[]);return a?minsToHrs(a):null;}),borderColor:'#4a90d9',backgroundColor:'rgba(74,144,217,0.1)',tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#4a90d9'},
+            {label:'Manual',data:allOut.map(d=>{const a=avgMins(manMap[d]||[]);return a?minsToHrs(a):null;} ),borderColor:'#7ab8e8',backgroundColor:'rgba(122,184,232,0.1)',tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#7ab8e8',borderDash:[5,3]}
+        ]});
+
+        // FG Receipt — duration col 4, endTime col 3
+        const fgInMap=avgByDay(fgInRows,r=>Number(r[3]),r=>parseDuration(r[4])), fgInLabels=Object.keys(fgInMap).sort();
+        makeChart('chart-fgin-avg','line',{labels:fgInLabels,datasets:[{label:'Avg Hrs',data:fgInLabels.map(d=>{const a=avgMins(fgInMap[d]);return a?minsToHrs(a):null;}),borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,0.1)',tension:0.3,fill:true,pointRadius:4,pointBackgroundColor:'#22c55e'}]},{plugins:{legend:{display:false}}});
+
+        // FG Pull
+        const fgAutoMap=avgByDay(fgOutRows.filter(r=>r[1]==='auto'),  r=>Number(r[4]),r=>parseDuration(r[5]));
+        const fgManMap =avgByDay(fgOutRows.filter(r=>r[1]==='manual'),r=>Number(r[4]),r=>parseDuration(r[5]));
+        const allFg=[...new Set([...Object.keys(fgAutoMap),...Object.keys(fgManMap)])].sort();
+        makeChart('chart-fgout-avg','line',{labels:allFg,datasets:[
+            {label:'Auto',  data:allFg.map(d=>{const a=avgMins(fgAutoMap[d]||[]);return a?minsToHrs(a):null;}),borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,0.1)',tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#a855f7'},
+            {label:'Manual',data:allFg.map(d=>{const a=avgMins(fgManMap[d]||[]);return a?minsToHrs(a):null;} ),borderColor:'#c084fc',backgroundColor:'rgba(192,132,252,0.1)',tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#c084fc',borderDash:[5,3]}
+        ]});
     }
 
     // ── SLA CHARTS ───────────────────────────────────────────
-    function drawSLACharts(inRows, outRows) {
-        function slaByDay(rows, getTs, getDur, limitMin) {
-            const map = {};
-            rows.forEach(r => {
-                const ts = getTs(r); if (isNaN(ts)) return;
-                const d  = new Date(ts);
-                const k  = `${d.getMonth()+1}/${d.getDate()}`;
-                if (!map[k]) map[k] = { met:0, total:0 };
-                map[k].total++;
-                const dur = getDur(r);
-                if (dur > 0 && dur <= limitMin) map[k].met++;
-            });
-            return map;
-        }
+    function drawSLACharts(inRows, outRows, fgInRows, fgOutRows) {
+        function slaByDay(rows,getTs,getDur,lim){ const map={}; rows.forEach(r=>{ const ts=getTs(r); if(isNaN(ts))return; const k=`${new Date(ts).getMonth()+1}/${new Date(ts).getDate()}`; if(!map[k])map[k]={met:0,total:0}; map[k].total++; const d=getDur(r); if(d>0&&d<=lim)map[k].met++; }); return map; }
 
-        const inSlaMap = slaByDay(inRows, r=>Number(r[5]), r=>parseDuration(r[6]), 300);
-        const inLabels  = Object.keys(inSlaMap).sort();
-        makeChart('chart-in-sla', 'line', {
-            labels: inLabels,
-            datasets: [{ label: 'SLA %', data: inLabels.map(d => {
-                const s = inSlaMap[d]; return s.total ? Math.round(s.met/s.total*100) : null;
-            }), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)',
-                tension: 0.3, fill: true, pointRadius: 4, pointBackgroundColor: '#22c55e' }]
-        }, { plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 } } });
+        // PI Receipt — 5h SLA
+        const inSM=slaByDay(inRows,r=>Number(r[5]),r=>parseDuration(r[6]),300), inSL=Object.keys(inSM).sort();
+        makeChart('chart-in-sla','line',{labels:inSL,datasets:[{label:'SLA %',data:inSL.map(d=>{const s=inSM[d];return s.total?Math.round(s.met/s.total*100):null;}),borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,0.1)',tension:0.3,fill:true,pointRadius:4,pointBackgroundColor:'#22c55e'}]},{plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}});
 
-        const autoSla   = slaByDay(outRows.filter(r=>r[1]==='auto'),   r=>Number(r[4]), r=>parseDuration(r[5]), 300);
-        const manSla    = slaByDay(outRows.filter(r=>r[1]==='manual'), r=>Number(r[4]), r=>parseDuration(r[5]),  60);
-        const allDays   = [...new Set([...Object.keys(autoSla),...Object.keys(manSla)])].sort();
-        makeChart('chart-out-sla', 'line', {
-            labels: allDays,
-            datasets: [
-                { label: 'Auto SLA %', data: allDays.map(d => {
-                    const s = autoSla[d]; return s ? Math.round(s.met/s.total*100) : null;
-                }), borderColor: '#4a90d9', backgroundColor: 'rgba(74,144,217,0.1)',
-                    tension: 0.3, fill: false, pointRadius: 4, pointBackgroundColor: '#4a90d9' },
-                { label: 'Manual SLA %', data: allDays.map(d => {
-                    const s = manSla[d]; return s ? Math.round(s.met/s.total*100) : null;
-                }), borderColor: '#7ab8e8', backgroundColor: 'rgba(122,184,232,0.1)',
-                    tension: 0.3, fill: false, pointRadius: 4, pointBackgroundColor: '#7ab8e8', borderDash: [5,3] }
-            ]
-        }, { scales: { y: { min: 0, max: 100 } } });
+        // PI Pull auto 5h / manual 1h
+        const autoSM=slaByDay(outRows.filter(r=>r[1]==='auto'),  r=>Number(r[4]),r=>parseDuration(r[5]),300);
+        const manSM =slaByDay(outRows.filter(r=>r[1]==='manual'),r=>Number(r[4]),r=>parseDuration(r[5]),60);
+        const allOut=[...new Set([...Object.keys(autoSM),...Object.keys(manSM)])].sort();
+        makeChart('chart-out-sla','line',{labels:allOut,datasets:[
+            {label:'Auto',  data:allOut.map(d=>{const s=autoSM[d];return s?Math.round(s.met/s.total*100):null;}),borderColor:'#4a90d9',backgroundColor:'rgba(74,144,217,0.1)',tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#4a90d9'},
+            {label:'Manual',data:allOut.map(d=>{const s=manSM[d]; return s?Math.round(s.met/s.total*100):null;}),borderColor:'#7ab8e8',backgroundColor:'rgba(122,184,232,0.1)',tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#7ab8e8',borderDash:[5,3]}
+        ]},{scales:{y:{min:0,max:100}}});
+
+        // FG Receipt — 2h SLA
+        const fgInSM=slaByDay(fgInRows,r=>Number(r[3]),r=>parseDuration(r[4]),120), fgInSL=Object.keys(fgInSM).sort();
+        makeChart('chart-fgin-sla','line',{labels:fgInSL,datasets:[{label:'SLA %',data:fgInSL.map(d=>{const s=fgInSM[d];return s.total?Math.round(s.met/s.total*100):null;}),borderColor:'#22c55e',backgroundColor:'rgba(34,197,94,0.1)',tension:0.3,fill:true,pointRadius:4,pointBackgroundColor:'#22c55e'}]},{plugins:{legend:{display:false}},scales:{y:{min:0,max:100}}});
+
+        // FG Pull auto 5h / manual 1h
+        const fgAutoSM=slaByDay(fgOutRows.filter(r=>r[1]==='auto'),  r=>Number(r[4]),r=>parseDuration(r[5]),300);
+        const fgManSM =slaByDay(fgOutRows.filter(r=>r[1]==='manual'),r=>Number(r[4]),r=>parseDuration(r[5]),60);
+        const allFg=[...new Set([...Object.keys(fgAutoSM),...Object.keys(fgManSM)])].sort();
+        makeChart('chart-fgout-sla','line',{labels:allFg,datasets:[
+            {label:'Auto',  data:allFg.map(d=>{const s=fgAutoSM[d];return s?Math.round(s.met/s.total*100):null;}),borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,0.1)',tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#a855f7'},
+            {label:'Manual',data:allFg.map(d=>{const s=fgManSM[d]; return s?Math.round(s.met/s.total*100):null;}),borderColor:'#c084fc',backgroundColor:'rgba(192,132,252,0.1)',tension:0.3,fill:false,pointRadius:4,pointBackgroundColor:'#c084fc',borderDash:[5,3]}
+        ]},{scales:{y:{min:0,max:100}}});
     }
 
-    // ── TYPE BREAKDOWN CHARTS ────────────────────────────────
-    function drawTypeCharts(inRows, outRows) {
-        const mfr  = inRows.filter(r => r[3]==='Manufacturer').length;
-        const xfr  = inRows.filter(r => r[3]==='Transfer').length;
-        makeChart('chart-in-type', 'doughnut', {
-            labels: ['Manufacturer', 'Transfer'],
-            datasets: [{ data: [mfr, xfr],
-                backgroundColor: ['rgba(225,38,28,0.85)', 'rgba(225,38,28,0.35)'],
-                borderColor: ['#e1261c','#e1261c'], borderWidth: 2 }]
-        }, { scales: {} });
+    // ── TYPE CHARTS ──────────────────────────────────────────
+    function drawTypeCharts(inRows, outRows, fgInRows, fgOutRows) {
+        // PI Receipt — Manufacturer vs Transfer (type col 3)
+        const mfr=inRows.filter(r=>r[3]==='Manufacturer').length, xfr=inRows.filter(r=>r[3]==='Transfer').length;
+        makeChart('chart-in-type','doughnut',{labels:['Manufacturer','Transfer'],datasets:[{data:[mfr,xfr],backgroundColor:['rgba(225,38,28,0.85)','rgba(225,38,28,0.35)'],borderColor:['#e1261c','#e1261c'],borderWidth:2}]},{scales:{}});
 
-        const autoVol = outRows.filter(r=>r[1]==='auto').length;
-        const manVol  = outRows.filter(r=>r[1]==='manual').length;
-        makeChart('chart-out-type-vol', 'doughnut', {
-            labels: ['Auto', 'Manual'],
-            datasets: [{ data: [autoVol, manVol],
-                backgroundColor: ['rgba(74,144,217,0.85)', 'rgba(74,144,217,0.35)'],
-                borderColor: ['#4a90d9','#4a90d9'], borderWidth: 2 }]
-        }, { scales: {} });
+        // PI Pull vol
+        makeChart('chart-out-type-vol','doughnut',{labels:['Auto','Manual'],datasets:[{data:[outRows.filter(r=>r[1]==='auto').length,outRows.filter(r=>r[1]==='manual').length],backgroundColor:['rgba(74,144,217,0.85)','rgba(74,144,217,0.35)'],borderColor:['#4a90d9','#4a90d9'],borderWidth:2}]},{scales:{}});
 
-        const autoA = avgMins(outRows.filter(r=>r[1]==='auto')  .map(r=>parseDuration(r[5])));
-        const manA  = avgMins(outRows.filter(r=>r[1]==='manual').map(r=>parseDuration(r[5])));
-        makeChart('chart-out-type-avg', 'bar', {
-            labels: ['Auto', 'Manual'],
-            datasets: [{ label: 'Avg Hours', data: [autoA ? minsToHrs(autoA) : 0, manA ? minsToHrs(manA) : 0],
-                backgroundColor: ['rgba(74,144,217,0.8)', 'rgba(74,144,217,0.4)'],
-                borderColor: '#4a90d9', borderWidth: 1, borderRadius: 6 }]
-        }, { plugins: { legend: { display: false } },
-             scales: { x: { ticks: { color: '#7a9bbf' } }, y: { ticks: { color: '#7a9bbf' }, beginAtZero: true } } });
+        // PI Pull avg
+        const outAutoA=avgMins(outRows.filter(r=>r[1]==='auto').map(r=>parseDuration(r[5]))), outManA=avgMins(outRows.filter(r=>r[1]==='manual').map(r=>parseDuration(r[5])));
+        makeChart('chart-out-type-avg','bar',{labels:['Auto','Manual'],datasets:[{label:'Avg Hrs',data:[outAutoA?minsToHrs(outAutoA):0,outManA?minsToHrs(outManA):0],backgroundColor:['rgba(74,144,217,0.8)','rgba(74,144,217,0.4)'],borderColor:'#4a90d9',borderWidth:1,borderRadius:6}]},{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#7a9bbf'}},y:{ticks:{color:'#7a9bbf'},beginAtZero:true}}});
+
+        // FG Pull vol
+        makeChart('chart-fgout-type-vol','doughnut',{labels:['Auto','Manual'],datasets:[{data:[fgOutRows.filter(r=>r[1]==='auto').length,fgOutRows.filter(r=>r[1]==='manual').length],backgroundColor:['rgba(168,85,247,0.85)','rgba(168,85,247,0.35)'],borderColor:['#a855f7','#a855f7'],borderWidth:2}]},{scales:{}});
+
+        // FG Pull avg
+        const fgAutoA=avgMins(fgOutRows.filter(r=>r[1]==='auto').map(r=>parseDuration(r[5]))), fgManA=avgMins(fgOutRows.filter(r=>r[1]==='manual').map(r=>parseDuration(r[5])));
+        makeChart('chart-fgout-type-avg','bar',{labels:['Auto','Manual'],datasets:[{label:'Avg Hrs',data:[fgAutoA?minsToHrs(fgAutoA):0,fgManA?minsToHrs(fgManA):0],backgroundColor:['rgba(168,85,247,0.8)','rgba(168,85,247,0.4)'],borderColor:'#a855f7',borderWidth:1,borderRadius:6}]},{plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#7a9bbf'}},y:{ticks:{color:'#7a9bbf'},beginAtZero:true}}});
     }
 
-    // ── PEAK HOURS CHARTS ────────────────────────────────────
-    function drawHourCharts(inRows, outRows) {
-        function hourCounts(rows, getTs) {
-            const counts = Array(24).fill(0);
-            rows.forEach(r => {
-                const ts = getTs(r); if (isNaN(ts)) return;
-                counts[new Date(ts).getHours()]++;
-            });
-            return counts;
-        }
+    // ── PEAK HOURS ───────────────────────────────────────────
+    function drawHourCharts(inRows, outRows, fgInRows, fgOutRows) {
+        function hourCounts(rows,getTs){ const c=Array(24).fill(0); rows.forEach(r=>{const ts=getTs(r);if(!isNaN(ts))c[new Date(ts).getHours()]++;}); return c; }
+        const hrLabels=Array.from({length:24},(_,i)=>{const h=i%12||12;return `${h}${i<12?'a':'p'}`;});
 
-        const hrLabels = Array.from({length:24}, (_,i) => {
-            const h = i % 12 || 12; return `${h}${i < 12 ? 'a' : 'p'}`;
-        });
+        const mkHour = (id, counts, color) => {
+            const mx=Math.max(...counts);
+            makeChart(id,'bar',{labels:hrLabels,datasets:[{label:'Started',data:counts,backgroundColor:counts.map(v=>`${color}${v===mx&&v>0?'e6':'66'}`),borderColor:color,borderWidth:1,borderRadius:3}]},{plugins:{legend:{display:false}}});
+        };
 
-        const inHrs  = hourCounts(inRows,  r => Number(r[4])); // startTime col 4
-        const outHrs = hourCounts(outRows, r => Number(r[3])); // startTime col 3
-
-        const inMax  = Math.max(...inHrs);
-        const outMax = Math.max(...outHrs);
-
-        makeChart('chart-in-hours', 'bar', {
-            labels: hrLabels,
-            datasets: [{ label: 'Receipts Started', data: inHrs,
-                backgroundColor: inHrs.map(v => `rgba(225,38,28,${v === inMax && v > 0 ? 0.9 : 0.4})`),
-                borderColor: '#e1261c', borderWidth: 1, borderRadius: 3 }]
-        }, { plugins: { legend: { display: false } } });
-
-        makeChart('chart-out-hours', 'bar', {
-            labels: hrLabels,
-            datasets: [{ label: 'Pulls Started', data: outHrs,
-                backgroundColor: outHrs.map(v => `rgba(74,144,217,${v === outMax && v > 0 ? 0.9 : 0.4})`),
-                borderColor: '#4a90d9', borderWidth: 1, borderRadius: 3 }]
-        }, { plugins: { legend: { display: false } } });
+        // PI Receipt startTime = col 4 (started)
+        mkHour('chart-in-hours',   hourCounts(inRows,   r=>Number(r[4])), '#e1261c');
+        mkHour('chart-out-hours',  hourCounts(outRows,  r=>Number(r[3])), '#4a90d9');
+        mkHour('chart-fgin-hours', hourCounts(fgInRows, r=>Number(r[2])), '#22c55e');
+        mkHour('chart-fgout-hours',hourCounts(fgOutRows,r=>Number(r[3])), '#a855f7');
     }
 
     // ── INIT ────────────────────────────────────────────────
