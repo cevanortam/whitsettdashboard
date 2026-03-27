@@ -920,8 +920,8 @@
 
         <!-- Mode toggle — 2x2 grid for four modes -->
         <div class="mode-toggle" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;">
-            <button class="mode-btn active-inbound" id="mode-pi-rec"  onclick="setMode('pi-rec')">Physical Inventory Receipt</button>
-            <button class="mode-btn" id="mode-pi-pull" onclick="setMode('pi-pull')">Physical Inventory Pull</button>
+            <button class="mode-btn active-inbound" id="mode-pi-rec"  onclick="setMode('pi-rec')">Parts Inventory Receipt</button>
+            <button class="mode-btn" id="mode-pi-pull" onclick="setMode('pi-pull')">Parts Inventory Pull</button>
             <button class="mode-btn" id="mode-fg-rec"  onclick="setMode('fg-rec')">Finished Goods Receipt</button>
             <button class="mode-btn" id="mode-fg-pull" onclick="setMode('fg-pull')">Finished Goods Pull</button>
         </div>
@@ -1021,7 +1021,7 @@
 
     <!-- 1. PI Receipts -->
     <div class="section-header">
-        <span class="section-title inbound">▼ Physical Inventory Receipts</span>
+        <span class="section-title inbound">▼ Parts Inventory Receipts</span>
         <div class="section-stats">
             <div class="stat-pill inbound"><span class="stat-val inbound" id="sec-in-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
@@ -1041,7 +1041,7 @@
 
     <!-- 2. PI Pulls -->
     <div class="section-header">
-        <span class="section-title outbound">▲ Physical Inventory Pulls</span>
+        <span class="section-title outbound">▲ Parts Inventory Pulls</span>
         <div class="section-stats">
             <div class="stat-pill outbound"><span class="stat-val outbound" id="sec-out-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
