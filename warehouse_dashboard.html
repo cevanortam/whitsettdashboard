@@ -647,28 +647,56 @@
             gap: 28px;
         }
 
-        /* KPI summary row */
-        .kpi-row {
+        /* KPI blocks — one per operation type */
+        .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 14px;
+        }
+
+        .kpi-block {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .kpi-block-header {
+            padding: 8px 14px;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .kpi-block-header.inbound  { color: var(--inbound);  background: rgba(225,38,28,0.08); }
+        .kpi-block-header.outbound { color: var(--outbound); background: rgba(74,144,217,0.08); }
+        .kpi-block-header.fg-in    { color: var(--fg-in);    background: rgba(34,197,94,0.08); }
+        .kpi-block-header.fg-out   { color: var(--fg-out);   background: rgba(168,85,247,0.08); }
+
+        .kpi-block-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            background: var(--border);
         }
 
         .kpi-card {
             background: var(--panel-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px 16px;
+            padding: 12px 14px;
             display: flex; flex-direction: column; gap: 4px;
         }
 
         .kpi-val {
-            font-size: 28px; font-weight: 900; line-height: 1;
+            font-size: 26px; font-weight: 900; line-height: 1;
             font-family: 'JetBrains Mono', monospace;
         }
 
         .kpi-val.inbound  { color: var(--inbound); }
         .kpi-val.outbound { color: var(--outbound); }
+        .kpi-val.fg-in    { color: var(--fg-in); }
+        .kpi-val.fg-out   { color: var(--fg-out); }
         .kpi-val.success  { color: var(--success); }
         .kpi-val.warning  { color: var(--warning); }
         .kpi-val.danger   { color: var(--danger); }
@@ -870,7 +898,7 @@
 
         <div class="brand">
             <div class="brand-icon">▶</div>
-            <h1>CEVA Logistics<br><span style="font-size:14px;font-weight:600;letter-spacing:3px;opacity:0.9;">Warehouse Dashboard</span></h1>
+            <h1>CEVA<br><span style="font-size:14px;font-weight:600;letter-spacing:3px;opacity:0.9;">WAREHOUSE OPS</span></h1>
         </div>
         <div id="syncStatus">INITIALIZING...</div>
 
@@ -920,10 +948,10 @@
 
         <!-- Mode toggle — 2x2 grid for four modes -->
         <div class="mode-toggle" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;">
-            <button class="mode-btn active-inbound" id="mode-pi-rec"  onclick="setMode('pi-rec')">Parts Inventory Receipt</button>
-            <button class="mode-btn" id="mode-pi-pull" onclick="setMode('pi-pull')">Parts Inventory Pull</button>
-            <button class="mode-btn" id="mode-fg-rec"  onclick="setMode('fg-rec')">Finished Goods Receipt</button>
-            <button class="mode-btn" id="mode-fg-pull" onclick="setMode('fg-pull')">Finished Goods Pull</button>
+            <button class="mode-btn active-inbound" id="mode-pi-rec"  onclick="setMode('pi-rec')">PI Receipt</button>
+            <button class="mode-btn" id="mode-pi-pull" onclick="setMode('pi-pull')">PI Pull</button>
+            <button class="mode-btn" id="mode-fg-rec"  onclick="setMode('fg-rec')">FG Receipt</button>
+            <button class="mode-btn" id="mode-fg-pull" onclick="setMode('fg-pull')">FG Pull</button>
         </div>
 
         <!-- Control panel -->
@@ -1004,10 +1032,10 @@
 
         <!-- Log buttons -->
         <div class="log-btn-group">
-            <button class="btn-log btn-log-inbound"   onclick="toggleLog('inbound')">📋 Parts Inventory Receipt History</button>
-            <button class="btn-log btn-log-outbound"  onclick="toggleLog('outbound')">📋 Parts Inventory Pull History</button>
-            <button class="btn-log btn-log-fg-in"     onclick="toggleLog('fg-rec')">📋 Finished Goods Receipt History</button>
-            <button class="btn-log btn-log-fg-out"    onclick="toggleLog('fg-pull')">📋 Finished Goods Pull History</button>
+            <button class="btn-log btn-log-inbound"   onclick="toggleLog('inbound')">📋 PI Receipt History</button>
+            <button class="btn-log btn-log-outbound"  onclick="toggleLog('outbound')">📋 PI Pull History</button>
+            <button class="btn-log btn-log-fg-in"     onclick="toggleLog('fg-rec')">📋 FG Receipt History</button>
+            <button class="btn-log btn-log-fg-out"    onclick="toggleLog('fg-pull')">📋 FG Pull History</button>
             <button class="btn-log btn-log-analytics" onclick="toggleAnalytics()">📊 Analytics</button>
         </div>
 
@@ -1021,7 +1049,7 @@
 
     <!-- 1. PI Receipts -->
     <div class="section-header">
-        <span class="section-title inbound">▼ Parts Inventory Receipts</span>
+        <span class="section-title inbound">▼ PI Receipts</span>
         <div class="section-stats">
             <div class="stat-pill inbound"><span class="stat-val inbound" id="sec-in-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
@@ -1041,7 +1069,7 @@
 
     <!-- 2. PI Pulls -->
     <div class="section-header">
-        <span class="section-title outbound">▲ Parts Inventory Pulls</span>
+        <span class="section-title outbound">▲ PI Pulls</span>
         <div class="section-stats">
             <div class="stat-pill outbound"><span class="stat-val outbound" id="sec-out-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
@@ -1065,7 +1093,7 @@
 
     <!-- 3. FG Receipts -->
     <div class="section-header">
-        <span class="section-title fg-in">▼ Finished Goods Receipts</span>
+        <span class="section-title fg-in">▼ FG Receipts</span>
         <div class="section-stats">
             <div class="stat-pill fg-in"><span class="stat-val fg-in" id="sec-fgin-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
@@ -1085,7 +1113,7 @@
 
     <!-- 4. FG Pulls -->
     <div class="section-header">
-        <span class="section-title fg-out">▲ Finished Goods Pulls</span>
+        <span class="section-title fg-out">▲ FG Pulls</span>
         <div class="section-stats">
             <div class="stat-pill fg-out"><span class="stat-val fg-out" id="sec-fgout-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
@@ -1126,24 +1154,49 @@
 
         <div class="analytics-body">
 
-            <!-- KPI Summary Row -->
-            <div class="kpi-row" id="kpi-row">
-                <div class="kpi-card"><div class="kpi-val inbound"  id="kpi-in-total">—</div><div class="kpi-lbl">PI Receipts Closed</div></div>
-                <div class="kpi-card"><div class="kpi-val inbound"  id="kpi-in-avg">—</div><div class="kpi-lbl">PI Receipt Avg</div></div>
-                <div class="kpi-card"><div class="kpi-val success"  id="kpi-in-sla">—</div><div class="kpi-lbl">PI Receipt SLA %</div></div>
-                <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-total">—</div><div class="kpi-lbl">PI Pulls Closed</div></div>
-                <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-avg-auto">—</div><div class="kpi-lbl">PI Auto Avg</div></div>
-                <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-avg-manual">—</div><div class="kpi-lbl">PI Manual Avg</div></div>
-                <div class="kpi-card"><div class="kpi-val success"  id="kpi-out-sla-auto">—</div><div class="kpi-lbl">PI Auto SLA %</div></div>
-                <div class="kpi-card"><div class="kpi-val success"  id="kpi-out-sla-manual">—</div><div class="kpi-lbl">PI Manual SLA %</div></div>
-                <div class="kpi-card"><div class="kpi-val fg-in"    id="kpi-fgin-total">—</div><div class="kpi-lbl">FG Receipts Closed</div></div>
-                <div class="kpi-card"><div class="kpi-val fg-in"    id="kpi-fgin-avg">—</div><div class="kpi-lbl">FG Receipt Avg</div></div>
-                <div class="kpi-card"><div class="kpi-val success"  id="kpi-fgin-sla">—</div><div class="kpi-lbl">FG Receipt SLA %</div></div>
-                <div class="kpi-card"><div class="kpi-val fg-out"   id="kpi-fgout-total">—</div><div class="kpi-lbl">FG Pulls Closed</div></div>
-                <div class="kpi-card"><div class="kpi-val fg-out"   id="kpi-fgout-avg-auto">—</div><div class="kpi-lbl">FG Auto Avg</div></div>
-                <div class="kpi-card"><div class="kpi-val fg-out"   id="kpi-fgout-avg-manual">—</div><div class="kpi-lbl">FG Manual Avg</div></div>
-                <div class="kpi-card"><div class="kpi-val success"  id="kpi-fgout-sla-auto">—</div><div class="kpi-lbl">FG Auto SLA %</div></div>
-                <div class="kpi-card"><div class="kpi-val success"  id="kpi-fgout-sla-manual">—</div><div class="kpi-lbl">FG Manual SLA %</div></div>
+            <!-- KPI Blocks — one per operation -->
+            <div class="kpi-grid">
+
+                <div class="kpi-block">
+                    <div class="kpi-block-header inbound">▼ PI Receipts</div>
+                    <div class="kpi-block-body">
+                        <div class="kpi-card"><div class="kpi-val inbound" id="kpi-in-total">—</div><div class="kpi-lbl">Closed</div></div>
+                        <div class="kpi-card"><div class="kpi-val inbound" id="kpi-in-avg">—</div><div class="kpi-lbl">Avg Time</div></div>
+                        <div class="kpi-card" style="grid-column:1/-1;"><div class="kpi-val success" id="kpi-in-sla">—</div><div class="kpi-lbl">SLA Compliance</div></div>
+                    </div>
+                </div>
+
+                <div class="kpi-block">
+                    <div class="kpi-block-header outbound">▲ PI Pulls</div>
+                    <div class="kpi-block-body">
+                        <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-total">—</div><div class="kpi-lbl">Closed</div></div>
+                        <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-avg-auto">—</div><div class="kpi-lbl">Auto Avg</div></div>
+                        <div class="kpi-card"><div class="kpi-val success"  id="kpi-out-sla-auto">—</div><div class="kpi-lbl">Auto SLA %</div></div>
+                        <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-avg-manual">—</div><div class="kpi-lbl">Manual Avg</div></div>
+                        <div class="kpi-card" style="grid-column:1/-1;"><div class="kpi-val success" id="kpi-out-sla-manual">—</div><div class="kpi-lbl">Manual SLA %</div></div>
+                    </div>
+                </div>
+
+                <div class="kpi-block">
+                    <div class="kpi-block-header fg-in">▼ FG Receipts</div>
+                    <div class="kpi-block-body">
+                        <div class="kpi-card"><div class="kpi-val fg-in" id="kpi-fgin-total">—</div><div class="kpi-lbl">Closed</div></div>
+                        <div class="kpi-card"><div class="kpi-val fg-in" id="kpi-fgin-avg">—</div><div class="kpi-lbl">Avg Time</div></div>
+                        <div class="kpi-card" style="grid-column:1/-1;"><div class="kpi-val success" id="kpi-fgin-sla">—</div><div class="kpi-lbl">SLA Compliance</div></div>
+                    </div>
+                </div>
+
+                <div class="kpi-block">
+                    <div class="kpi-block-header fg-out">▲ FG Pulls</div>
+                    <div class="kpi-block-body">
+                        <div class="kpi-card"><div class="kpi-val fg-out" id="kpi-fgout-total">—</div><div class="kpi-lbl">Closed</div></div>
+                        <div class="kpi-card"><div class="kpi-val fg-out" id="kpi-fgout-avg-auto">—</div><div class="kpi-lbl">Auto Avg</div></div>
+                        <div class="kpi-card"><div class="kpi-val success" id="kpi-fgout-sla-auto">—</div><div class="kpi-lbl">Auto SLA %</div></div>
+                        <div class="kpi-card"><div class="kpi-val fg-out" id="kpi-fgout-avg-manual">—</div><div class="kpi-lbl">Manual Avg</div></div>
+                        <div class="kpi-card" style="grid-column:1/-1;"><div class="kpi-val success" id="kpi-fgout-sla-manual">—</div><div class="kpi-lbl">Manual SLA %</div></div>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Volume Over Time -->
@@ -1311,8 +1364,8 @@
     // ── API ENDPOINTS ───────────────────────────────────────
     const REC_API    = "https://script.google.com/macros/s/AKfycbzlqj_tnDRI6tGDy5MCjyq3XovJmoTCWhvhZqHKMjuDDjil7j6kcwyGHrjGnbYhXURaow/exec";
     const PULL_API   = "https://script.google.com/macros/s/AKfycbxHR1-V7u-cF1paXo6JGAbyvljuPp5IVNT2l10vX8y-JdcO7phjMKwDTZ36eynEWWO-_w/exec";
-    const FG_REC_API  = "https://script.google.com/macros/s/AKfycbx326pKvmwfMuy-1xqHKKre8XL7JTxm1Nj-Bj-wzWpla39S_pvsP4mXChs5CRNU27ih/exec";  // ← replace after deploying
-    const FG_PULL_API = "https://script.google.com/macros/s/AKfycbw-C3wpB6xXoIfStmMBb46kdXMmCha9BCY_XuX29iO5h3IRiEr7W19oWCO97y_7D22wXw/exec";     // ← replace after deploying
+    const FG_REC_API  = "YOUR_FG_RECEIPT_DEPLOYMENT_URL";  // ← replace after deploying
+    const FG_PULL_API = "YOUR_FG_PULL_DEPLOYMENT_URL";     // ← replace after deploying
 
     // SLA thresholds (ms)
     const PI_REC_SLA  = { amber: 7200000,  red: 14400000, true: 18000000 };           // 2h / 4h / 5h
@@ -1357,7 +1410,6 @@
         document.getElementById('syncStatus').innerText  = online ? `● ONLINE — ${ts}` : '● OFFLINE';
         document.getElementById('syncStatus').style.color = online ? 'var(--success)' : 'var(--danger)';
         updateSummary();
-        invalidateAnalyticsCache();
     }
 
     // ── SHIFT SUMMARY ──────────────────────────────────────
@@ -1547,23 +1599,22 @@
             setSaving('in-saving',true);
             await fetch(REC_API,{method:'POST',body:JSON.stringify({action:'CLOSE_REC',trailer:item.trailer,key,endTime:Date.now(),duration}),mode:'no-cors'});
             document.getElementById('in-trailer').value=''; document.getElementById('in-door').value='';
-            setTimeout(()=>{syncAll();setSaving('in-saving',false);},2500);
+            setTimeout(()=>{invalidateAnalyticsCache();syncAll();setSaving('in-saving',false);},2500);
         } else if (kind==='wave') {
             setSaving('out-saving',true);
             await fetch(PULL_API,{method:'POST',body:JSON.stringify({action:'CLOSE_WAVE',id:key,endTime:Date.now(),duration}),mode:'no-cors'});
             document.getElementById('out-id').value=''; document.getElementById('out-qty').value='';
-            setTimeout(()=>{syncAll();setSaving('out-saving',false);},2500);
+            setTimeout(()=>{invalidateAnalyticsCache();syncAll();setSaving('out-saving',false);},2500);
         } else if (kind==='fg-rec') {
             setSaving('fgin-saving',true);
-            // CLOSE_WAVE matches the copied PI Pull Apps Script — id is the PO/DN value
             await fetch(FG_REC_API,{method:'POST',body:JSON.stringify({action:'CLOSE_WAVE',id:key,endTime:Date.now(),duration}),mode:'no-cors'});
             document.getElementById('fgin-po').value=''; document.getElementById('fgin-qty').value='';
-            setTimeout(()=>{syncAll();setSaving('fgin-saving',false);},2500);
+            setTimeout(()=>{invalidateAnalyticsCache();syncAll();setSaving('fgin-saving',false);},2500);
         } else {
             setSaving('fgout-saving',true);
             await fetch(FG_PULL_API,{method:'POST',body:JSON.stringify({action:'CLOSE_WAVE',id:key,endTime:Date.now(),duration}),mode:'no-cors'});
             document.getElementById('fgout-id').value=''; document.getElementById('fgout-qty').value='';
-            setTimeout(()=>{syncAll();setSaving('fgout-saving',false);},2500);
+            setTimeout(()=>{invalidateAnalyticsCache();syncAll();setSaving('fgout-saving',false);},2500);
         }
     }
 
@@ -1781,19 +1832,34 @@
     }
 
     async function loadAnalytics() {
-        try { if (!inLogCache)   { const r=await fetch(`${REC_API}?action=GET_LOG&t=${Date.now()}`);    const d=await r.json(); inLogCache   = d.slice(1); } } catch { inLogCache   = []; }
-        try { if (!outLogCache)  { const r=await fetch(`${PULL_API}?action=GET_LOG&t=${Date.now()}`);   const d=await r.json(); outLogCache  = d.slice(1); } } catch { outLogCache  = []; }
-        try { if (!fgInLogCache) { const r=await fetch(`${FG_REC_API}?action=GET_LOG&t=${Date.now()}`); const d=await r.json(); fgInLogCache = d.slice(1); } } catch { fgInLogCache = []; }
-        try { if (!fgOutLogCache){ const r=await fetch(`${FG_PULL_API}?action=GET_LOG&t=${Date.now()}`);const d=await r.json(); fgOutLogCache= d.slice(1); } } catch { fgOutLogCache= []; }
+        // Show loading state on KPI cards
+        document.querySelectorAll('.kpi-val').forEach(el => { if(el.innerText==='—'||el.innerText==='') el.innerText='…'; });
 
-        // PI Receipt archive: Door(0),Trailer(1),BOL(2),Type(3),Started(4),Ended(5),Duration(6) — endTime=r[5]
-        // PI Pull archive:    ID(0),Type(1),Qty(2),StartTime(3),EndTime(4),Duration(5)          — endTime=r[4]
-        // FG Receipt archive: PO/DN(0),Qty(1),Started(2),Ended(3),Duration(4)                  — endTime=r[3]
-        // FG Pull archive:    ID(0),Type(1),Qty(2),StartTime(3),EndTime(4),Duration(5)          — endTime=r[4]
-        const inRows     = filterByRange(inLogCache,    r => Number(r[5]));
-        const outRows    = filterByRange(outLogCache,   r => Number(r[4]));
-        const fgInRows   = filterByRange(fgInLogCache,  r => Number(r[3]));
-        const fgOutRows  = filterByRange(fgOutLogCache, r => Number(r[4]));
+        // Fetch all four logs in parallel — each resolves independently
+        const fetchLog = async (api) => {
+            const r = await fetch(`${api}?action=GET_LOG&t=${Date.now()}`);
+            const d = await r.json();
+            return d.slice(1);
+        };
+
+        const [inRes, outRes, fgInRes, fgOutRes] = await Promise.allSettled([
+            inLogCache    ? Promise.resolve(inLogCache)    : fetchLog(REC_API),
+            outLogCache   ? Promise.resolve(outLogCache)   : fetchLog(PULL_API),
+            fgInLogCache  ? Promise.resolve(fgInLogCache)  : fetchLog(FG_REC_API),
+            fgOutLogCache ? Promise.resolve(fgOutLogCache) : fetchLog(FG_PULL_API)
+        ]);
+
+        if (inRes.status    === 'fulfilled') inLogCache    = inRes.value;    else inLogCache    = [];
+        if (outRes.status   === 'fulfilled') outLogCache   = outRes.value;   else outLogCache   = [];
+        if (fgInRes.status  === 'fulfilled') fgInLogCache  = fgInRes.value;  else fgInLogCache  = [];
+        if (fgOutRes.status === 'fulfilled') fgOutLogCache = fgOutRes.value; else fgOutLogCache = [];
+
+        // PI Receipt: endTime=r[5] | PI Pull: endTime=r[4]
+        // FG Receipt: endTime=r[3] | FG Pull: endTime=r[4]
+        const inRows    = filterByRange(inLogCache,    r => Number(r[5]));
+        const outRows   = filterByRange(outLogCache,   r => Number(r[4]));
+        const fgInRows  = filterByRange(fgInLogCache,  r => Number(r[3]));
+        const fgOutRows = filterByRange(fgOutLogCache, r => Number(r[4]));
 
         drawKPIs(inRows, outRows, fgInRows, fgOutRows);
         drawVolumeCharts(inRows, outRows, fgInRows, fgOutRows);
