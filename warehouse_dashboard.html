@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CEVA Logistics — Warehouse Dashboard</title>
+    <title>Lenovo Dashboard - CEVA Logistics</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -905,7 +905,7 @@
         <!-- Shift Summary -->
         <div id="shift-summary" style="grid-template-columns:1fr 1fr 1fr 1fr;">
             <div class="summary-col">
-                <div class="summary-col-label inbound">PI Receipts</div>
+                <div class="summary-col-label inbound">Parts Inventory Receipts</div>
                 <div class="summary-row"><span class="summary-lbl">Active</span><span class="summary-val inbound" id="in-active">0</span></div>
                 <div class="summary-row"><span class="summary-lbl">Closed</span><span class="summary-val inbound" id="in-closed">0</span></div>
                 <div class="summary-row"><span class="summary-lbl">Avg</span><span class="summary-val inbound" id="in-avg">—</span></div>
@@ -914,7 +914,7 @@
                 <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Today Avg</span><span class="summary-val inbound" id="in-avg-today">—</span></div>
             </div>
             <div class="summary-col">
-                <div class="summary-col-label outbound">PI Pulls</div>
+                <div class="summary-col-label outbound">Parts Inventory Pulls</div>
                 <div class="summary-row"><span class="summary-lbl">Active</span><span class="summary-val outbound" id="out-active">0</span></div>
                 <div class="summary-row"><span class="summary-lbl">Closed</span><span class="summary-val outbound" id="out-closed">0</span></div>
                 <div class="summary-row"><span class="summary-lbl">Auto Avg</span><span class="summary-val outbound" id="out-avg">—</span></div>
@@ -925,7 +925,7 @@
                 <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Man Avg</span><span class="summary-val outbound" id="out-avg-manual-today">—</span></div>
             </div>
             <div class="summary-col">
-                <div class="summary-col-label" style="color:var(--fg-in);">FG Receipts</div>
+                <div class="summary-col-label" style="color:var(--fg-in);">Finished Goods Receipts</div>
                 <div class="summary-row"><span class="summary-lbl">Active</span><span class="summary-val fg-in" id="fgin-active">0</span></div>
                 <div class="summary-row"><span class="summary-lbl">Closed</span><span class="summary-val fg-in" id="fgin-closed">0</span></div>
                 <div class="summary-row"><span class="summary-lbl">Avg</span><span class="summary-val fg-in" id="fgin-avg">—</span></div>
@@ -934,7 +934,7 @@
                 <div class="summary-row"><span class="summary-lbl" style="color:var(--muted);">Today Avg</span><span class="summary-val fg-in" id="fgin-avg-today">—</span></div>
             </div>
             <div class="summary-col">
-                <div class="summary-col-label" style="color:var(--fg-out);">FG Pulls</div>
+                <div class="summary-col-label" style="color:var(--fg-out);">Finished Goods Pulls</div>
                 <div class="summary-row"><span class="summary-lbl">Active</span><span class="summary-val fg-out" id="fgout-active">0</span></div>
                 <div class="summary-row"><span class="summary-lbl">Closed</span><span class="summary-val fg-out" id="fgout-closed">0</span></div>
                 <div class="summary-row"><span class="summary-lbl">Auto Avg</span><span class="summary-val fg-out" id="fgout-avg">—</span></div>
@@ -948,10 +948,10 @@
 
         <!-- Mode toggle — 2x2 grid for four modes -->
         <div class="mode-toggle" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;">
-            <button class="mode-btn active-inbound" id="mode-pi-rec"  onclick="setMode('pi-rec')">PI Receipt</button>
-            <button class="mode-btn" id="mode-pi-pull" onclick="setMode('pi-pull')">PI Pull</button>
-            <button class="mode-btn" id="mode-fg-rec"  onclick="setMode('fg-rec')">FG Receipt</button>
-            <button class="mode-btn" id="mode-fg-pull" onclick="setMode('fg-pull')">FG Pull</button>
+            <button class="mode-btn active-inbound" id="mode-pi-rec"  onclick="setMode('pi-rec')">Parts Inventory Receipt</button>
+            <button class="mode-btn" id="mode-pi-pull" onclick="setMode('pi-pull')">Parts Inventory Pull</button>
+            <button class="mode-btn" id="mode-fg-rec"  onclick="setMode('fg-rec')">Finished Goods Receipt</button>
+            <button class="mode-btn" id="mode-fg-pull" onclick="setMode('fg-pull')">Finished Goods Pull</button>
         </div>
 
         <!-- Control panel -->
@@ -1032,10 +1032,10 @@
 
         <!-- Log buttons -->
         <div class="log-btn-group">
-            <button class="btn-log btn-log-inbound"   onclick="toggleLog('inbound')">📋 PI Receipt History</button>
-            <button class="btn-log btn-log-outbound"  onclick="toggleLog('outbound')">📋 PI Pull History</button>
-            <button class="btn-log btn-log-fg-in"     onclick="toggleLog('fg-rec')">📋 FG Receipt History</button>
-            <button class="btn-log btn-log-fg-out"    onclick="toggleLog('fg-pull')">📋 FG Pull History</button>
+            <button class="btn-log btn-log-inbound"   onclick="toggleLog('inbound')">📋 Parts Inventory Receipt History</button>
+            <button class="btn-log btn-log-outbound"  onclick="toggleLog('outbound')">📋 Parts Inventory Pull History</button>
+            <button class="btn-log btn-log-fg-in"     onclick="toggleLog('fg-rec')">📋 Finished Goods Receipt History</button>
+            <button class="btn-log btn-log-fg-out"    onclick="toggleLog('fg-pull')">📋 Finished Goods Pull History</button>
             <button class="btn-log btn-log-analytics" onclick="toggleAnalytics()">📊 Analytics</button>
         </div>
 
@@ -1049,7 +1049,7 @@
 
     <!-- 1. PI Receipts -->
     <div class="section-header">
-        <span class="section-title inbound">▼ PI Receipts</span>
+        <span class="section-title inbound">▼ Parts Inventory Receipts</span>
         <div class="section-stats">
             <div class="stat-pill inbound"><span class="stat-val inbound" id="sec-in-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
@@ -1064,12 +1064,12 @@
         <div class="section-line inbound"></div>
     </div>
     <div class="section-grid" id="grid-inbound">
-        <div class="section-empty" id="empty-inbound">No active PI receipts</div>
+        <div class="section-empty" id="empty-inbound">No active Parts Inventory receipts</div>
     </div>
 
     <!-- 2. PI Pulls -->
     <div class="section-header">
-        <span class="section-title outbound">▲ PI Pulls</span>
+        <span class="section-title outbound">▲ Parts Inventory Pulls</span>
         <div class="section-stats">
             <div class="stat-pill outbound"><span class="stat-val outbound" id="sec-out-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
@@ -1088,12 +1088,12 @@
         <div class="section-line outbound"></div>
     </div>
     <div class="section-grid" id="grid-outbound">
-        <div class="section-empty" id="empty-outbound">No active PI pulls</div>
+        <div class="section-empty" id="empty-outbound">No active Parts Inventory pulls</div>
     </div>
 
     <!-- 3. FG Receipts -->
     <div class="section-header">
-        <span class="section-title fg-in">▼ FG Receipts</span>
+        <span class="section-title fg-in">▼ Finished Goods Receipts</span>
         <div class="section-stats">
             <div class="stat-pill fg-in"><span class="stat-val fg-in" id="sec-fgin-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
@@ -1108,12 +1108,12 @@
         <div class="section-line fg-in"></div>
     </div>
     <div class="section-grid" id="grid-fg-in">
-        <div class="section-empty" id="empty-fg-in">No active FG receipts</div>
+        <div class="section-empty" id="empty-fg-in">No active Finished Goods receipts</div>
     </div>
 
     <!-- 4. FG Pulls -->
     <div class="section-header">
-        <span class="section-title fg-out">▲ FG Pulls</span>
+        <span class="section-title fg-out">▲ Finished Goods Pulls</span>
         <div class="section-stats">
             <div class="stat-pill fg-out"><span class="stat-val fg-out" id="sec-fgout-active">0</span><span class="stat-lbl">Active</span></div>
             <div class="stat-sep"></div>
@@ -1132,7 +1132,7 @@
         <div class="section-line fg-out"></div>
     </div>
     <div class="section-grid" id="grid-fg-out">
-        <div class="section-empty" id="empty-fg-out">No active FG pulls</div>
+        <div class="section-empty" id="empty-fg-out">No active Finished Goods pulls</div>
     </div>
 
 </div>
@@ -1158,7 +1158,7 @@
             <div class="kpi-grid">
 
                 <div class="kpi-block">
-                    <div class="kpi-block-header inbound">▼ PI Receipts</div>
+                    <div class="kpi-block-header inbound">▼ Parts Inventory Receipts</div>
                     <div class="kpi-block-body">
                         <div class="kpi-card"><div class="kpi-val inbound" id="kpi-in-total">—</div><div class="kpi-lbl">Closed</div></div>
                         <div class="kpi-card"><div class="kpi-val inbound" id="kpi-in-avg">—</div><div class="kpi-lbl">Avg Time</div></div>
@@ -1167,7 +1167,7 @@
                 </div>
 
                 <div class="kpi-block">
-                    <div class="kpi-block-header outbound">▲ PI Pulls</div>
+                    <div class="kpi-block-header outbound">▲ Parts Inventory Pulls</div>
                     <div class="kpi-block-body">
                         <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-total">—</div><div class="kpi-lbl">Closed</div></div>
                         <div class="kpi-card"><div class="kpi-val outbound" id="kpi-out-avg-auto">—</div><div class="kpi-lbl">Auto Avg</div></div>
@@ -1178,7 +1178,7 @@
                 </div>
 
                 <div class="kpi-block">
-                    <div class="kpi-block-header fg-in">▼ FG Receipts</div>
+                    <div class="kpi-block-header fg-in">▼ Finished Goods Receipts</div>
                     <div class="kpi-block-body">
                         <div class="kpi-card"><div class="kpi-val fg-in" id="kpi-fgin-total">—</div><div class="kpi-lbl">Closed</div></div>
                         <div class="kpi-card"><div class="kpi-val fg-in" id="kpi-fgin-avg">—</div><div class="kpi-lbl">Avg Time</div></div>
@@ -1187,7 +1187,7 @@
                 </div>
 
                 <div class="kpi-block">
-                    <div class="kpi-block-header fg-out">▲ FG Pulls</div>
+                    <div class="kpi-block-header fg-out">▲ Finished Goods Pulls</div>
                     <div class="kpi-block-body">
                         <div class="kpi-card"><div class="kpi-val fg-out" id="kpi-fgout-total">—</div><div class="kpi-lbl">Closed</div></div>
                         <div class="kpi-card"><div class="kpi-val fg-out" id="kpi-fgout-avg-auto">—</div><div class="kpi-lbl">Auto Avg</div></div>
@@ -1203,10 +1203,10 @@
             <div class="chart-section">
                 <div class="chart-section-title">Volume Over Time</div>
                 <div class="chart-grid">
-                    <div class="chart-box"><div class="chart-box-title">PI Receipts Per Day</div><canvas id="chart-in-volume" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">PI Pulls Per Day</div><canvas id="chart-out-volume" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">FG Receipts Per Day</div><canvas id="chart-fgin-volume" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">FG Pulls Per Day</div><canvas id="chart-fgout-volume" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Parts Inventory Receipts Per Day</div><canvas id="chart-in-volume" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Parts Inventory Pulls Per Day</div><canvas id="chart-out-volume" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Finished Goods Receipts Per Day</div><canvas id="chart-fgin-volume" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Finished Goods Pulls Per Day</div><canvas id="chart-fgout-volume" height="180"></canvas></div>
                 </div>
             </div>
 
@@ -1214,10 +1214,10 @@
             <div class="chart-section">
                 <div class="chart-section-title">Average Duration Trend</div>
                 <div class="chart-grid">
-                    <div class="chart-box"><div class="chart-box-title">PI Receipt Avg Duration Per Day (hrs)</div><canvas id="chart-in-avg" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">PI Pull Avg Duration Per Day (hrs)</div><canvas id="chart-out-avg" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">FG Receipt Avg Duration Per Day (hrs)</div><canvas id="chart-fgin-avg" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">FG Pull Avg Duration Per Day (hrs)</div><canvas id="chart-fgout-avg" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Parts Inventory Receipt Avg Duration Per Day (hrs)</div><canvas id="chart-in-avg" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Parts Inventory Pull Avg Duration Per Day (hrs)</div><canvas id="chart-out-avg" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Finished Goods Receipt Avg Duration Per Day (hrs)</div><canvas id="chart-fgin-avg" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Finished Goods Pull Avg Duration Per Day (hrs)</div><canvas id="chart-fgout-avg" height="180"></canvas></div>
                 </div>
             </div>
 
@@ -1225,10 +1225,10 @@
             <div class="chart-section">
                 <div class="chart-section-title">SLA Compliance</div>
                 <div class="chart-grid">
-                    <div class="chart-box"><div class="chart-box-title">PI Receipt SLA Over Time (%)</div><canvas id="chart-in-sla" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">PI Pull SLA — Auto vs Manual (%)</div><canvas id="chart-out-sla" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">FG Receipt SLA Over Time (%)</div><canvas id="chart-fgin-sla" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">FG Pull SLA — Auto vs Manual (%)</div><canvas id="chart-fgout-sla" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Parts Inventory Receipt SLA Over Time (%)</div><canvas id="chart-in-sla" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Parts Inventory Pull SLA — Auto vs Manual (%)</div><canvas id="chart-out-sla" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Finished Goods Receipt SLA Over Time (%)</div><canvas id="chart-fgin-sla" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Finished Goods Pull SLA — Auto vs Manual (%)</div><canvas id="chart-fgout-sla" height="180"></canvas></div>
                 </div>
             </div>
 
@@ -1236,11 +1236,11 @@
             <div class="chart-section">
                 <div class="chart-section-title">Breakdown by Type</div>
                 <div class="chart-grid triple">
-                    <div class="chart-box"><div class="chart-box-title">PI Receipts — Manufacturer vs Transfer</div><canvas id="chart-in-type" height="200"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">PI Pulls — Auto vs Manual Volume</div><canvas id="chart-out-type-vol" height="200"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">PI Pulls — Auto vs Manual Avg Duration</div><canvas id="chart-out-type-avg" height="200"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">FG Pulls — Auto vs Manual Volume</div><canvas id="chart-fgout-type-vol" height="200"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">FG Pulls — Auto vs Manual Avg Duration</div><canvas id="chart-fgout-type-avg" height="200"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Parts Inventory Receipts — Manufacturer vs Transfer</div><canvas id="chart-in-type" height="200"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Parts Inventory Pulls — Auto vs Manual Volume</div><canvas id="chart-out-type-vol" height="200"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Parts Inventory Pulls — Auto vs Manual Avg Duration</div><canvas id="chart-out-type-avg" height="200"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Finished Goods Pulls — Auto vs Manual Volume</div><canvas id="chart-fgout-type-vol" height="200"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Finished Goods Pulls — Auto vs Manual Avg Duration</div><canvas id="chart-fgout-type-avg" height="200"></canvas></div>
                 </div>
             </div>
 
@@ -1248,10 +1248,10 @@
             <div class="chart-section">
                 <div class="chart-section-title">Peak Activity Hours</div>
                 <div class="chart-grid">
-                    <div class="chart-box"><div class="chart-box-title">PI Receipts Started by Hour</div><canvas id="chart-in-hours" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">PI Pulls Started by Hour</div><canvas id="chart-out-hours" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">FG Receipts Started by Hour</div><canvas id="chart-fgin-hours" height="180"></canvas></div>
-                    <div class="chart-box"><div class="chart-box-title">FG Pulls Started by Hour</div><canvas id="chart-fgout-hours" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Parts Inventory Receipts Started by Hour</div><canvas id="chart-in-hours" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Parts Inventory Pulls Started by Hour</div><canvas id="chart-out-hours" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Finished Goods Receipts Started by Hour</div><canvas id="chart-fgin-hours" height="180"></canvas></div>
+                    <div class="chart-box"><div class="chart-box-title">Finished Goods Pulls Started by Hour</div><canvas id="chart-fgout-hours" height="180"></canvas></div>
                 </div>
             </div>
 
@@ -1285,7 +1285,7 @@
 <div class="log-overlay" id="log-outbound">
     <div class="log-modal">
         <div class="log-header" style="border-top: 4px solid var(--outbound); border-radius: 16px 16px 0 0;">
-            <h2 style="color:var(--outbound);">▲ PI Pull History</h2>
+            <h2 style="color:var(--outbound);">▲ Parts Inventory Pull History</h2>
             <div style="display:flex;gap:10px;">
                 <button class="log-close-btn" onclick="exportCSV('outbound')" style="background:var(--outbound);border-color:var(--outbound);color:#fff;">⬇ Export CSV</button>
                 <button class="log-close-btn" onclick="toggleLog('outbound')">✕ Close</button>
@@ -1307,7 +1307,7 @@
 <div class="log-overlay" id="log-fg-rec">
     <div class="log-modal">
         <div class="log-header" style="border-top: 4px solid var(--fg-in); border-radius: 16px 16px 0 0;">
-            <h2 style="color:var(--fg-in);">▼ FG Receipt History</h2>
+            <h2 style="color:var(--fg-in);">▼ Finished Goods Receipt History</h2>
             <div style="display:flex;gap:10px;">
                 <button class="log-close-btn" onclick="exportCSV('fg-rec')" style="background:var(--fg-in);border-color:var(--fg-in);color:#000;">⬇ Export CSV</button>
                 <button class="log-close-btn" onclick="toggleLog('fg-rec')">✕ Close</button>
@@ -1328,7 +1328,7 @@
 <div class="log-overlay" id="log-fg-pull">
     <div class="log-modal">
         <div class="log-header" style="border-top: 4px solid var(--fg-out); border-radius: 16px 16px 0 0;">
-            <h2 style="color:var(--fg-out);">▲ FG Pull History</h2>
+            <h2 style="color:var(--fg-out);">▲ Finished Goods Pull History</h2>
             <div style="display:flex;gap:10px;">
                 <button class="log-close-btn" onclick="exportCSV('fg-pull')" style="background:var(--fg-out);border-color:var(--fg-out);color:#fff;">⬇ Export CSV</button>
                 <button class="log-close-btn" onclick="toggleLog('fg-pull')">✕ Close</button>
@@ -1498,7 +1498,7 @@
         const t=document.getElementById('in-trailer').value.trim();
         if (!t) { alert('Select an active receipt card or enter a Trailer # to close.'); return; }
         const key=Object.keys(activeRecs).find(k=>activeRecs[k].trailer===t||k===t);
-        if (!key) { alert('No active PI receipt found for that Trailer #.'); return; }
+        if (!key) { alert('No active Parts Inventory receipt found for that Trailer #.'); return; }
         pendingClose={kind:'rec',key,item:activeRecs[key]}; showConfirm('rec',activeRecs[key]);
     }
 
@@ -1516,8 +1516,8 @@
 
     function initiateCloseWave() {
         const idVal=document.getElementById('out-id').value.trim();
-        if (!idVal) { alert('Select an active PI pull card or enter a Pull ID to close.'); return; }
-        if (!activeWaves[idVal]) { alert('No active PI pull found for that ID.'); return; }
+        if (!idVal) { alert('Select an active Parts Inventory pull card or enter a Pull ID to close.'); return; }
+        if (!activeWaves[idVal]) { alert('No active Parts Inventory pull found for that ID.'); return; }
         pendingClose={kind:'wave',key:idVal,item:activeWaves[idVal]}; showConfirm('wave',activeWaves[idVal]);
     }
 
@@ -1537,10 +1537,10 @@
 
     function initiateCloseFgRec() {
         const poVal=document.getElementById('fgin-po').value.trim();
-        if (!poVal) { alert('Select an active FG receipt card or enter a PO/DN to close.'); return; }
+        if (!poVal) { alert('Select an active Finished Goods receipt card or enter a PO/DN to close.'); return; }
         // activeFgRecs keyed by the id field (which stores the PO/DN)
         const key=Object.keys(activeFgRecs).find(k=>k===poVal||activeFgRecs[k].id===poVal);
-        if (!key) { alert('No active FG receipt found for that PO/DN.'); return; }
+        if (!key) { alert('No active Finished Goods receipt found for that PO/DN.'); return; }
         pendingClose={kind:'fg-rec',key,item:activeFgRecs[key]}; showConfirm('fg-rec',activeFgRecs[key]);
     }
 
@@ -1562,8 +1562,8 @@
 
     function initiateCloseFgPull() {
         const idVal=document.getElementById('fgout-id').value.trim();
-        if (!idVal) { alert('Select an active FG pull card or enter a Pull ID to close.'); return; }
-        if (!activeFgPulls[idVal]) { alert('No active FG pull found for that ID.'); return; }
+        if (!idVal) { alert('Select an active Finished Goods pull card or enter a Pull ID to close.'); return; }
+        if (!activeFgPulls[idVal]) { alert('No active Finished Goods pull found for that ID.'); return; }
         pendingClose={kind:'fg-pull',key:idVal,item:activeFgPulls[idVal]}; showConfirm('fg-pull',activeFgPulls[idVal]);
     }
 
@@ -1575,7 +1575,7 @@
 
     // ── CONFIRM DIALOG ──────────────────────────────────────
     function showConfirm(kind, item) {
-        const titles = {'rec':'Close PI Receipt?','wave':'Complete PI Pull?','fg-rec':'Close FG Receipt?','fg-pull':'Complete FG Pull?'};
+        const titles = {'rec':'Close Parts Inventory Receipt?','wave':'Complete Parts Inventory Pull?','fg-rec':'Close Finished Goods Receipt?','fg-pull':'Complete Finished Goods Pull?'};
         document.getElementById('confirm-title').innerText = titles[kind] || 'Archive?';
         document.getElementById('confirm-sub').innerText   = 'This will archive the record and stop tracking.';
         if (kind==='rec')
@@ -1683,7 +1683,7 @@
                 'fg-pull': item.type==='manual' ? '1H SLA · ⚡30M · 🔴45M' : '5H SLA · ⚡2H · 🔴4H'
             };
             const accentClass  = {rec:'inbound',wave:'outbound','fg-rec':'fg-in','fg-pull':'fg-out'}[kind];
-            const typeLabel    = {rec:'▼ PI Receipt',wave:'▲ PI Pull','fg-rec':'▼ FG Receipt','fg-pull':'▲ FG Pull'}[kind];
+            const typeLabel    = {rec:'▼ Parts Inventory Receipt',wave:'▲ Parts Inventory Pull','fg-rec':'▼ Finished Goods Receipt','fg-pull':'▲ Finished Goods Pull'}[kind];
             const primaryVal   = kind==='rec' ? item.door : kind==='fg-rec' ? item.id : `#${item.id}`;
             const chip1        = kind==='rec' ? item.trailer : kind==='fg-rec' ? (item.qty?`QTY: ${item.qty}`:'QTY: —') : (item.qty?`QTY: ${item.qty}`:'QTY: —');
             const chip2        = kind==='rec' ? item.type : kind==='fg-rec' ? '' : (item.type==='manual'?'Manual':'Auto');
@@ -1947,7 +1947,7 @@
             makeChart(id,'bar',{labels,datasets:[{label,data:labels.map(d=>days[d]),backgroundColor:`${color}b3`,borderColor:color,borderWidth:1,borderRadius:4}]},{plugins:{legend:{display:false}}});
         };
         mkBar('chart-in-volume',    inRows,    r=>Number(r[5]), '#e1261c', 'Receipts');
-        mkBar('chart-fgin-volume',  fgInRows,  r=>Number(r[3]), '#22c55e', 'FG Receipts');
+        mkBar('chart-fgin-volume',  fgInRows,  r=>Number(r[3]), '#22c55e', 'Finished Goods Receipts');
 
         // PI Pulls — split auto/manual
         const outDays=groupByDay(outRows,r=>Number(r[4])), outLabels=Object.keys(outDays).sort();
