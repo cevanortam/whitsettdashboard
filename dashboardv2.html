@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Whitsett Pull Tracker - CEVA Logistics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary:    #00204E;
+        --panel-bg:   #003057;
+        --border:     #0a3f72;
+        --red:        #C8102E;
+        --success:    #22c55e;
+        --warning:    #f59e0b;
+        --danger:     #C8102E;
+        --muted:      #a8c4e0;
+        --text:       #e8eef6;
+        --bg:         #f2f4f7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Barlow', 'Segoe UI', sans-serif;
+        background: var(--bg);
+        color: #1a1a1a;
+        min-height: 100vh;
+    }
+
+    /* ── HEADER ─────────────────────────────────────────── */
+    header {
+        background: var(--primary);
+        color: #fff;
+        padding: 16px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
+        border-bottom: 4px solid var(--red);
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; }
+
+    .brand img {
+        height: 38px;
+        filter: brightness(0) invert(1);
+    }
+
+    .brand-text h1 {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 24px; font-weight: 900;
+        text-transform: uppercase; letter-spacing: 1.5px;
+        line-height: 1;
+    }
+
+    .brand-text p {
+        font-size: 12px; color: var(--muted);
+        text-transform: uppercase; letter-spacing: 1px;
+        margin-top: 4px;
+    }
+
+    #syncStatus {
+        font-size: 11px;
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--muted);
+        letter-spacing: 0.5px;
+    }
+
+    .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        border: none;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 14px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.8px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .btn-primary { background: var(--red); color: #fff; }
+    .btn-primary:hover { background: #a50d24; }
+
+    .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1.5px solid rgba(255,255,255,0.25); }
+    .btn-secondary:hover { background: rgba(255,255,255,0.18); }
+
+    /* ── MAIN ───────────────────────────────────────────── */
+    main { padding: 24px 28px; max-width: 1700px; margin: 0 auto; }
+
+    .section-title {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 22px; font-weight: 900;
+        text-transform: uppercase; letter-spacing: 1.5px;
+        color: var(--primary);
+        margin: 28px 0 14px;
+        display: flex; align-items: center; gap: 10px;
+        padding-bottom: 8px;
+        border-bottom: 3px solid var(--border);
+    }
+
+    .section-title:first-child { margin-top: 0; }
+
+    .section-title .count-badge {
+        background: var(--primary);
+        color: #fff;
+        font-size: 14px;
+        padding: 2px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+    }
+
+    .empty-msg {
+        color: #888;
+        font-size: 15px;
+        font-style: italic;
+        padding: 30px;
+        text-align: center;
+        background: #fff;
+        border-radius: 12px;
+        border: 1.5px dashed #ccc;
+    }
+
+    /* ── CARD GRID ──────────────────────────────────────── */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+        gap: 18px;
+    }
+
+    .pull-card {
+        position: relative;
+        border-radius: 14px;
+        padding: 18px 20px;
+        color: #fff;
+        background: var(--success);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        transition: background 0.4s ease;
+        cursor: pointer;
+    }
+
+    .pull-card.warning { background: var(--warning); }
+    .pull-card.danger  { background: var(--danger); }
+    .pull-card.qa      { background: #4a5a7a; }
+
+    .pull-card:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0,0,0,0.18); }
+
+    .card-top-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 4px;
+    }
+
+    .card-type-label {
+        font-size: 11px; font-weight: 900;
+        text-transform: uppercase; letter-spacing: 2px;
+        opacity: 0.9;
+    }
+
+    .sla-tag {
+        background: rgba(0,0,0,0.25);
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .id-val {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 56px; font-weight: 900;
+        line-height: 1; letter-spacing: -1px;
+        margin: 6px 0 10px;
+        word-break: break-all;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 10px;
+    }
+
+    .timer-block { display: flex; flex-direction: column; }
+    .timer-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.85; margin-bottom: 2px; }
+    .timer-val   { font-family: 'JetBrains Mono', monospace; font-size: 38px; font-weight: 700; line-height: 1; }
+
+    .remaining-block { display: flex; flex-direction: column; align-items: flex-end; }
+    .remaining-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; margin-bottom: 2px; }
+    .remaining-val   { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; line-height: 1; }
+    .remaining-val.overdue { color: #ffe1e1; }
+
+    /* ── MODAL ──────────────────────────────────────────── */
+    .modal-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.55);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(3px);
+    }
+
+    .modal-overlay.visible { display: flex; }
+
+    .modal {
+        background: #fff;
+        border-radius: 16px;
+        padding: 28px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+    }
+
+    .modal h2 {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 22px; font-weight: 900;
+        text-transform: uppercase; letter-spacing: 1px;
+        color: var(--primary);
+        margin-bottom: 18px;
+    }
+
+    .modal label {
+        display: block;
+        font-size: 12px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.8px;
+        color: #555; margin-bottom: 6px;
+    }
+
+    .modal input, .modal select {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1.5px solid #ddd;
+        border-radius: 8px;
+        font-family: 'Barlow', sans-serif;
+        font-size: 15px; font-weight: 600;
+        margin-bottom: 16px;
+    }
+
+    .modal input:focus, .modal select:focus { outline: none; border-color: var(--primary); }
+
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+    .btn-light { background: #eee; color: #333; }
+    .btn-light:hover { background: #ddd; }
+
+    /* Action menu modal */
+    .action-modal h2 { word-break: break-all; }
+    .action-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .action-list .btn { width: 100%; padding: 14px; font-size: 15px; }
+
+    .modal-meta {
+        font-size: 13px; color: #777;
+        margin-bottom: 18px;
+        line-height: 1.6;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── METRICS PAGE ───────────────────────────────────── */
+    #metrics-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.85);
+        z-index: 2000;
+        align-items: flex-start;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    #metrics-overlay.visible { display: flex; }
+
+    .metrics-modal {
+        background: var(--panel-bg);
+        border: 1.5px solid var(--border);
+        border-radius: 18px;
+        width: 100%;
+        max-width: 1300px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+        margin: auto;
+        color: var(--text);
+    }
+
+    .metrics-header {
+        padding: 18px 24px;
+        border-bottom: 1.5px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        position: sticky;
+        top: 0;
+        background: var(--panel-bg);
+        z-index: 10;
+    }
+
+    .metrics-header h2 {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 20px; font-weight: 900;
+        text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    .metrics-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .range-btn {
+        padding: 6px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 6px;
+        background: transparent;
+        color: var(--muted);
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 13px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .range-btn:hover { background: var(--border); color: var(--text); }
+    .range-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+
+    .close-btn {
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        border: 1.5px solid var(--border);
+        background: transparent;
+        color: var(--muted);
+        font-size: 16px;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+    .close-btn:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+    .metrics-body { padding: 24px; display: flex; flex-direction: column; gap: 28px; }
+
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 14px;
+    }
+
+    .kpi-block {
+        background: var(--primary);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 18px;
+    }
+
+    .kpi-block .kpi-label {
+        font-size: 11px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 1px; color: var(--muted); margin-bottom: 6px;
+    }
+
+    .kpi-block .kpi-val {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 30px; font-weight: 700; line-height: 1;
+    }
+
+    .kpi-block .kpi-sub {
+        font-size: 12px; color: var(--muted); margin-top: 4px;
+    }
+
+    .table-wrap {
+        background: var(--primary);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .table-wrap h3 {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 16px; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 1px;
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+    th, td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+    }
+
+    th {
+        font-weight: 800; text-transform: uppercase;
+        letter-spacing: 0.8px; font-size: 11px;
+        color: var(--muted);
+    }
+
+    td { font-family: 'JetBrains Mono', monospace; }
+
+    .pill {
+        display: inline-block;
+        padding: 2px 9px;
+        border-radius: 999px;
+        font-size: 11px; font-weight: 700;
+        font-family: 'Barlow Condensed', sans-serif;
+        text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .pill-met { background: rgba(34,197,94,0.2); color: #4ade80; }
+    .pill-breach { background: rgba(200,16,46,0.2); color: #fca5a5; }
+
+    .table-scroll { overflow-x: auto; max-height: 420px; overflow-y: auto; }
+
+    @media (max-width: 700px) {
+        header { padding: 14px 16px; }
+        main { padding: 16px; }
+        .id-val { font-size: 42px; }
+        .timer-val { font-size: 30px; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <img src="https://www.cevalogistics.com/themes/custom/ceva/logo.svg" alt="CEVA Logistics" onerror="this.style.display='none'">
+        <div class="brand-text">
+            <h1>Parts Inventory Pull Tracker</h1>
+            <p>Whitsett, NC &mdash; Warehouse Operations</p>
+        </div>
+    </div>
+    <div class="header-actions">
+        <span id="syncStatus">Connecting...</span>
+        <button class="btn btn-secondary" onclick="openMetrics()">Metrics</button>
+        <button class="btn btn-primary" onclick="openNewPullModal()">+ New Pull</button>
+    </div>
+</header>
+
+<main>
+    <div class="section-title">
+        Active Pulls <span class="count-badge" id="activeCount">0</span>
+    </div>
+    <div class="card-grid" id="activeGrid"></div>
+    <div class="empty-msg" id="activeEmpty" style="display:none;">No active pulls. Click "+ New Pull" to start one.</div>
+
+    <div class="section-title">
+        QA Review <span class="count-badge" id="qaCount">0</span>
+    </div>
+    <div class="card-grid" id="qaGrid"></div>
+    <div class="empty-msg" id="qaEmpty" style="display:none;">No pulls currently in QA.</div>
+</main>
+
+<!-- New Pull Modal -->
+<div class="modal-overlay" id="newPullOverlay">
+    <div class="modal">
+        <h2>New Pull</h2>
+        <label for="pullIdInput">Pull ID</label>
+        <input type="text" id="pullIdInput" placeholder="e.g. PULL-10234" autocomplete="off">
+        <label for="pullTypeInput">Pull Type</label>
+        <select id="pullTypeInput">
+            <option value="MANUAL">Manual Pull (1 hr SLA)</option>
+            <option value="AUTO">Auto Pull (5 hr SLA)</option>
+        </select>
+        <div class="modal-actions">
+            <button class="btn btn-light" onclick="closeNewPullModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="submitNewPull()">Start Pull</button>
+        </div>
+    </div>
+</div>
+
+<!-- Card Action Modal -->
+<div class="modal-overlay" id="actionOverlay">
+    <div class="modal action-modal">
+        <h2 id="actionModalTitle">Pull</h2>
+        <div class="modal-meta" id="actionModalMeta"></div>
+        <div class="action-list" id="actionModalButtons"></div>
+        <div class="modal-actions" style="margin-top:16px;">
+            <button class="btn btn-light" onclick="closeActionModal()" style="width:100%;">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Metrics Overlay -->
+<div id="metrics-overlay">
+    <div class="metrics-modal">
+        <div class="metrics-header">
+            <h2>Pull Metrics</h2>
+            <div class="metrics-controls">
+                <button class="range-btn active" data-range="today" onclick="setMetricsRange('today')">Today</button>
+                <button class="range-btn" data-range="week" onclick="setMetricsRange('week')">Week</button>
+                <button class="range-btn" data-range="month" onclick="setMetricsRange('month')">Month</button>
+                <button class="range-btn" data-range="all" onclick="setMetricsRange('all')">All Time</button>
+                <button class="close-btn" onclick="closeMetrics()">&times;</button>
+            </div>
+        </div>
+        <div class="metrics-body" id="metricsBody">
+            <div class="empty-msg">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API = "https://script.google.com/macros/s/AKfycbzC6U7B4OrUa4aXTayoBseJle3RxufPNH41TZbhCIOCEZDs26oWWyebEka11oW3lH6fcg/exec";
+
+    let activePulls = {}; // pullId -> { pullId, pullType, slaMinutes, status, startTime, qaStartTime }
+    let online = false;
+    let selectedCardId = null;
+    let metricsRange = 'today';
+
+    // ── DATA FETCH ──────────────────────────────────────
+    async function fetchActive() {
+        try {
+            const r = await fetch(`${API}?payload=${encodeURIComponent(JSON.stringify({action:'GET_ACTIVE'}))}&t=${Date.now()}`);
+            const data = await r.json();
+            if (data.error) throw new Error(data.error);
+            activePulls = data;
+            online = true;
+        } catch (err) {
+            online = false;
+            console.error('Fetch active failed:', err);
+        }
+        updateSyncStatus();
+        render();
+    }
+
+    function updateSyncStatus() {
+        const el = document.getElementById('syncStatus');
+        const now = new Date().toLocaleTimeString();
+        el.textContent = online ? `Synced ${now}` : `Offline - retry ${now}`;
+        el.style.color = online ? '#a8c4e0' : '#fca5a5';
+    }
+
+    // ── RENDER ──────────────────────────────────────────
+    function render() {
+        const activeGrid = document.getElementById('activeGrid');
+        const qaGrid = document.getElementById('qaGrid');
+        activeGrid.innerHTML = '';
+        qaGrid.innerHTML = '';
+
+        let activeCount = 0, qaCount = 0;
+
+        const ids = Object.keys(activePulls).sort();
+
+        ids.forEach(id => {
+            const pull = activePulls[id];
+            if (pull.status === 'PULLING') {
+                activeGrid.appendChild(buildPullCard(pull));
+                activeCount++;
+            } else if (pull.status === 'QA') {
+                qaGrid.appendChild(buildQACard(pull));
+                qaCount++;
+            }
+        });
+
+        document.getElementById('activeCount').textContent = activeCount;
+        document.getElementById('qaCount').textContent = qaCount;
+        document.getElementById('activeEmpty').style.display = activeCount === 0 ? 'block' : 'none';
+        document.getElementById('qaEmpty').style.display = qaCount === 0 ? 'block' : 'none';
+    }
+
+    function buildPullCard(pull) {
+        const card = document.createElement('div');
+        card.className = 'pull-card';
+        card.dataset.pullId = pull.pullId;
+        card.onclick = () => openActionModal(pull.pullId);
+
+        const elapsedSec = Math.floor((Date.now() - pull.startTime) / 1000);
+        const slaSec = pull.slaMinutes * 60;
+        const remainingSec = slaSec - elapsedSec;
+
+        // Color thresholds
+        let colorClass = '';
+        if (pull.pullType === 'MANUAL') {
+            if (elapsedSec >= 45*60) colorClass = 'danger';
+            else if (elapsedSec >= 30*60) colorClass = 'warning';
+        } else { // AUTO
+            if (elapsedSec >= 4*60*60) colorClass = 'danger';
+            else if (elapsedSec >= 2*60*60) colorClass = 'warning';
+        }
+        if (colorClass) card.classList.add(colorClass);
+
+        const slaLabel = pull.pullType === 'MANUAL' ? '1 HR SLA' : '5 HR SLA';
+
+        card.innerHTML = `
+            <div class="card-top-row">
+                <div class="card-type-label">${pull.pullType} PULL</div>
+                <div class="sla-tag">${slaLabel}</div>
+            </div>
+            <div class="id-val">${escapeHtml(pull.pullId)}</div>
+            <div class="card-footer">
+                <div class="timer-block">
+                    <div class="timer-label">Elapsed</div>
+                    <div class="timer-val" data-elapsed>${formatDuration(elapsedSec)}</div>
+                </div>
+                <div class="remaining-block">
+                    <div class="remaining-label">Remaining</div>
+                    <div class="remaining-val ${remainingSec < 0 ? 'overdue' : ''}" data-remaining>${formatRemaining(remainingSec)}</div>
+                </div>
+            </div>
+        `;
+        return card;
+    }
+
+    function buildQACard(pull) {
+        const card = document.createElement('div');
+        card.className = 'pull-card qa';
+        card.dataset.pullId = pull.pullId;
+        card.onclick = () => openActionModal(pull.pullId);
+
+        const elapsedSec = Math.floor((Date.now() - pull.qaStartTime) / 1000);
+
+        card.innerHTML = `
+            <div class="card-top-row">
+                <div class="card-type-label">${pull.pullType} PULL</div>
+                <div class="sla-tag">IN QA</div>
+            </div>
+            <div class="id-val">${escapeHtml(pull.pullId)}</div>
+            <div class="card-footer">
+                <div class="timer-block">
+                    <div class="timer-label">QA Time Elapsed</div>
+                    <div class="timer-val" data-elapsed>${formatDuration(elapsedSec)}</div>
+                </div>
+            </div>
+        `;
+        return card;
+    }
+
+    // ── TIMER TICK (updates display without re-fetching) ──
+    function tick() {
+        document.querySelectorAll('#activeGrid .pull-card').forEach(card => {
+            const id = card.dataset.pullId;
+            const pull = activePulls[id];
+            if (!pull) return;
+
+            const elapsedSec = Math.floor((Date.now() - pull.startTime) / 1000);
+            const slaSec = pull.slaMinutes * 60;
+            const remainingSec = slaSec - elapsedSec;
+
+            card.querySelector('[data-elapsed]').textContent = formatDuration(elapsedSec);
+            const remEl = card.querySelector('[data-remaining]');
+            remEl.textContent = formatRemaining(remainingSec);
+            remEl.classList.toggle('overdue', remainingSec < 0);
+
+            // Update color
+            card.classList.remove('warning', 'danger');
+            if (pull.pullType === 'MANUAL') {
+                if (elapsedSec >= 45*60) card.classList.add('danger');
+                else if (elapsedSec >= 30*60) card.classList.add('warning');
+            } else {
+                if (elapsedSec >= 4*60*60) card.classList.add('danger');
+                else if (elapsedSec >= 2*60*60) card.classList.add('warning');
+            }
+        });
+
+        document.querySelectorAll('#qaGrid .pull-card').forEach(card => {
+            const id = card.dataset.pullId;
+            const pull = activePulls[id];
+            if (!pull) return;
+            const elapsedSec = Math.floor((Date.now() - pull.qaStartTime) / 1000);
+            card.querySelector('[data-elapsed]').textContent = formatDuration(elapsedSec);
+        });
+    }
+
+    // ── FORMATTERS ──────────────────────────────────────
+    function formatDuration(totalSec) {
+        if (totalSec < 0) totalSec = 0;
+        const h = Math.floor(totalSec / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = totalSec % 60;
+        if (h > 0) return `${h}:${pad(m)}:${pad(s)}`;
+        return `${m}:${pad(s)}`;
+    }
+
+    function formatRemaining(totalSec) {
+        const overdue = totalSec < 0;
+        const abs = Math.abs(totalSec);
+        const h = Math.floor(abs / 3600);
+        const m = Math.floor((abs % 3600) / 60);
+        const s = abs % 60;
+        const str = h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+        return overdue ? `-${str}` : str;
+    }
+
+    function pad(n) { return n.toString().padStart(2, '0'); }
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ── NEW PULL MODAL ──────────────────────────────────
+    function openNewPullModal() {
+        document.getElementById('pullIdInput').value = '';
+        document.getElementById('pullTypeInput').value = 'MANUAL';
+        document.getElementById('newPullOverlay').classList.add('visible');
+        setTimeout(() => document.getElementById('pullIdInput').focus(), 50);
+    }
+
+    function closeNewPullModal() {
+        document.getElementById('newPullOverlay').classList.remove('visible');
+    }
+
+    async function submitNewPull() {
+        const pullId = document.getElementById('pullIdInput').value.trim();
+        const pullType = document.getElementById('pullTypeInput').value;
+
+        if (!pullId) {
+            alert('Please enter a Pull ID.');
+            return;
+        }
+
+        // Optimistic local check
+        if (activePulls[pullId]) {
+            alert('That Pull ID is already active.');
+            return;
+        }
+
+        const startTime = Date.now();
+
+        try {
+            const payload = { action: 'CREATE_PULL', pullId, pullType, startTime };
+            const r = await fetch(`${API}?payload=${encodeURIComponent(JSON.stringify(payload))}`);
+            const data = await r.json();
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+        } catch (err) {
+            alert('Failed to create pull. Check connection.');
+            console.error(err);
+            return;
+        }
+
+        closeNewPullModal();
+        await fetchActive();
+    }
+
+    // ── ACTION MODAL ────────────────────────────────────
+    function openActionModal(pullId) {
+        const pull = activePulls[pullId];
+        if (!pull) return;
+        selectedCardId = pullId;
+
+        document.getElementById('actionModalTitle').textContent = pullId;
+
+        let metaHtml = `Type: ${pull.pullType} PULL<br>`;
+        metaHtml += `Started: ${new Date(pull.startTime).toLocaleString()}<br>`;
+        if (pull.qaStartTime) {
+            metaHtml += `QA Started: ${new Date(pull.qaStartTime).toLocaleString()}<br>`;
+        }
+        document.getElementById('actionModalMeta').innerHTML = metaHtml;
+
+        const buttonsEl = document.getElementById('actionModalButtons');
+        buttonsEl.innerHTML = '';
+
+        if (pull.status === 'PULLING') {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-primary';
+            btn.textContent = 'Advance to QA';
+            btn.onclick = () => advanceToQA(pullId);
+            buttonsEl.appendChild(btn);
+        } else if (pull.status === 'QA') {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-primary';
+            btn.textContent = 'Pull Complete';
+            btn.onclick = () => completePull(pullId);
+            buttonsEl.appendChild(btn);
+        }
+
+        document.getElementById('actionOverlay').classList.add('visible');
+    }
+
+    function closeActionModal() {
+        document.getElementById('actionOverlay').classList.remove('visible');
+        selectedCardId = null;
+    }
+
+    async function advanceToQA(pullId) {
+        const qaStartTime = Date.now();
+        try {
+            const payload = { action: 'ADVANCE_QA', pullId, qaStartTime };
+            const r = await fetch(`${API}?payload=${encodeURIComponent(JSON.stringify(payload))}`);
+            const data = await r.json();
+            if (data.error) { alert(data.error); return; }
+        } catch (err) {
+            alert('Failed to advance to QA. Check connection.');
+            console.error(err);
+            return;
+        }
+        closeActionModal();
+        await fetchActive();
+    }
+
+    async function completePull(pullId) {
+        const completeTime = Date.now();
+        try {
+            const payload = { action: 'COMPLETE_PULL', pullId, completeTime };
+            const r = await fetch(`${API}?payload=${encodeURIComponent(JSON.stringify(payload))}`);
+            const data = await r.json();
+            if (data.error) { alert(data.error); return; }
+        } catch (err) {
+            alert('Failed to complete pull. Check connection.');
+            console.error(err);
+            return;
+        }
+        closeActionModal();
+        await fetchActive();
+    }
+
+    // ── METRICS ─────────────────────────────────────────
+    function openMetrics() {
+        document.getElementById('metrics-overlay').classList.add('visible');
+        loadMetrics();
+    }
+
+    function closeMetrics() {
+        document.getElementById('metrics-overlay').classList.remove('visible');
+    }
+
+    function setMetricsRange(range) {
+        metricsRange = range;
+        document.querySelectorAll('.range-btn').forEach(b => b.classList.toggle('active', b.dataset.range === range));
+        loadMetrics();
+    }
+
+    async function loadMetrics() {
+        const body = document.getElementById('metricsBody');
+        body.innerHTML = '<div class="empty-msg">Loading...</div>';
+
+        try {
+            const payload = { action: 'GET_METRICS', range: metricsRange };
+            const r = await fetch(`${API}?payload=${encodeURIComponent(JSON.stringify(payload))}&t=${Date.now()}`);
+            const m = await r.json();
+            if (m.error) throw new Error(m.error);
+            renderMetrics(m);
+        } catch (err) {
+            body.innerHTML = '<div class="empty-msg">Failed to load metrics.</div>';
+            console.error(err);
+        }
+    }
+
+    function renderMetrics(m) {
+        const body = document.getElementById('metricsBody');
+
+        const manualSLAPct = (m.manualSLAMet + m.manualSLABreached) > 0
+            ? Math.round(100 * m.manualSLAMet / (m.manualSLAMet + m.manualSLABreached)) : 0;
+        const autoSLAPct = (m.autoSLAMet + m.autoSLABreached) > 0
+            ? Math.round(100 * m.autoSLAMet / (m.autoSLAMet + m.autoSLABreached)) : 0;
+
+        let html = '';
+
+        html += `<div class="kpi-grid">
+            <div class="kpi-block">
+                <div class="kpi-label">Total Pulls</div>
+                <div class="kpi-val">${m.totalPulls}</div>
+                <div class="kpi-sub">${m.manualCount} Manual / ${m.autoCount} Auto</div>
+            </div>
+            <div class="kpi-block">
+                <div class="kpi-label">Manual SLA Met</div>
+                <div class="kpi-val">${manualSLAPct}%</div>
+                <div class="kpi-sub">${m.manualSLAMet} met / ${m.manualSLABreached} breached</div>
+            </div>
+            <div class="kpi-block">
+                <div class="kpi-label">Auto SLA Met</div>
+                <div class="kpi-val">${autoSLAPct}%</div>
+                <div class="kpi-sub">${m.autoSLAMet} met / ${m.autoSLABreached} breached</div>
+            </div>
+            <div class="kpi-block">
+                <div class="kpi-label">Avg Manual Pull</div>
+                <div class="kpi-val">${formatDuration(m.avgManualPullSec)}</div>
+                <div class="kpi-sub">vs 1:00:00 SLA</div>
+            </div>
+            <div class="kpi-block">
+                <div class="kpi-label">Avg Auto Pull</div>
+                <div class="kpi-val">${formatDuration(m.avgAutoPullSec)}</div>
+                <div class="kpi-sub">vs 5:00:00 SLA</div>
+            </div>
+            <div class="kpi-block">
+                <div class="kpi-label">Avg QA Time</div>
+                <div class="kpi-val">${formatDuration(m.avgQASec)}</div>
+                <div class="kpi-sub">across all completed pulls</div>
+            </div>
+        </div>`;
+
+        html += `<div class="table-wrap">
+            <h3>Completed Pulls</h3>
+            <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pull ID</th>
+                        <th>Type</th>
+                        <th>SLA</th>
+                        <th>Started</th>
+                        <th>QA Started</th>
+                        <th>Completed</th>
+                        <th>Pull Time</th>
+                        <th>QA Time</th>
+                        <th>SLA Result</th>
+                    </tr>
+                </thead>
+                <tbody>`;
+
+        const rows = [...m.completedPulls].sort((a, b) => new Date(b.completeTime) - new Date(a.completeTime));
+
+        if (rows.length === 0) {
+            html += `<tr><td colspan="9" style="text-align:center; font-style:italic; color:#888;">No completed pulls in this range.</td></tr>`;
+        } else {
+            rows.forEach(p => {
+                html += `<tr>
+                    <td>${escapeHtml(p.pullId)}</td>
+                    <td>${p.pullType}</td>
+                    <td>${p.slaMinutes >= 60 ? (p.slaMinutes/60) + ' hr' : p.slaMinutes + ' min'}</td>
+                    <td>${new Date(p.startTime).toLocaleString()}</td>
+                    <td>${p.qaStartTime ? new Date(p.qaStartTime).toLocaleString() : '-'}</td>
+                    <td>${p.completeTime ? new Date(p.completeTime).toLocaleString() : '-'}</td>
+                    <td>${formatDuration(p.pullDurationSec)}</td>
+                    <td>${p.qaDurationSec !== null && p.qaDurationSec !== '' ? formatDuration(p.qaDurationSec) : '-'}</td>
+                    <td><span class="pill ${p.metSLA ? 'pill-met' : 'pill-breach'}">${p.metSLA ? 'Met' : 'Breach'}</span></td>
+                </tr>`;
+            });
+        }
+
+        html += `</tbody></table></div></div>`;
+
+        body.innerHTML = html;
+    }
+
+    // ── INIT ────────────────────────────────────────────
+    fetchActive();
+    setInterval(fetchActive, 30000); // refresh from sheet every 30s
+    setInterval(tick, 1000);          // update timers every second
+</script>
+
+</body>
+</html>
