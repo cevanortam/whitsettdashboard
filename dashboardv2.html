@@ -76,8 +76,9 @@
     .brand { display: flex; align-items: center; gap: 14px; }
 
     .brand img {
-        height: 38px;
+        height: 48px;
         filter: brightness(0) invert(1);
+        object-fit: contain;
     }
 
     .brand-text h1 {
@@ -453,6 +454,16 @@
         .id-val { font-size: 42px; }
         .timer-val { font-size: 30px; }
     }
+
+    /* ── TV MODE ────────────────────────────────────────── */
+    body.tv-mode .header-actions > *:not(#syncStatus):not(#tvModeBtn) {
+        display: none;
+    }
+
+    body.tv-mode .id-val { font-size: 68px; }
+    body.tv-mode .timer-val { font-size: 46px; }
+    body.tv-mode .card-grid { gap: 22px; }
+    body.tv-mode main { padding: 28px 36px; }
 </style>
 </head>
 <body>
@@ -461,7 +472,7 @@
 
 <header>
     <div class="brand">
-        <img src="https://www.cevalogistics.com/themes/custom/ceva/logo.svg" alt="CEVA Logistics" onerror="this.style.display='none'">
+        <img src="https://www.freelogovectors.net/wp-content/uploads/2022/07/ceva-logistics-logo-freelogovectors.net_.png" alt="CEVA Logistics" onerror="this.style.display='none'">
         <div class="brand-text">
             <h1>Parts Inventory Pull Tracker</h1>
             <p>Whitsett, NC &mdash; Warehouse Operations</p>
@@ -471,6 +482,7 @@
         <span id="syncStatus">Connecting...</span>
         <button class="btn btn-secondary" onclick="openMetrics()">Metrics</button>
         <button class="btn btn-primary" onclick="openNewPullModal()">+ New Pull</button>
+        <button class="btn btn-secondary" id="tvModeBtn" onclick="toggleTvMode()">TV Mode</button>
     </div>
 </header>
 
@@ -1055,7 +1067,21 @@
         body.innerHTML = html;
     }
 
+    // ── TV MODE ─────────────────────────────────────────
+    function toggleTvMode() {
+        const enabled = document.body.classList.toggle('tv-mode');
+        document.getElementById('tvModeBtn').textContent = enabled ? 'Exit TV Mode' : 'TV Mode';
+        try { localStorage.setItem('tvMode', enabled ? '1' : '0'); } catch (e) {}
+    }
+
     // ── INIT ────────────────────────────────────────────
+    try {
+        if (localStorage.getItem('tvMode') === '1') {
+            document.body.classList.add('tv-mode');
+            document.getElementById('tvModeBtn').textContent = 'Exit TV Mode';
+        }
+    } catch (e) {}
+
     fetchActive();
     setInterval(fetchActive, 30000); // refresh from sheet every 30s
     setInterval(tick, 1000);          // update timers every second
