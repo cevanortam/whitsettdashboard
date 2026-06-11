@@ -22,6 +22,37 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* ── LOADING BAR ────────────────────────────────────── */
+    #loading-bar {
+        position: fixed;
+        top: 0; left: 0;
+        height: 3px;
+        width: 0%;
+        background: var(--red);
+        z-index: 9999;
+        transition: width 0.2s ease-out, opacity 0.3s ease;
+        opacity: 0;
+        box-shadow: 0 0 8px var(--red);
+    }
+
+    #loading-bar.active {
+        opacity: 1;
+        width: 70%;
+        transition: width 4s cubic-bezier(0.1,0.5,0.1,1), opacity 0.2s ease;
+    }
+
+    #loading-bar.done {
+        width: 100%;
+        opacity: 1;
+        transition: width 0.2s ease-out, opacity 0.4s ease 0.2s;
+    }
+
+    #loading-bar.hidden {
+        opacity: 0;
+        width: 0%;
+        transition: opacity 0.2s ease;
+    }
+
     body {
         font-family: 'Barlow', 'Segoe UI', sans-serif;
         background: var(--bg);
@@ -426,6 +457,8 @@
 </head>
 <body>
 
+<div id="loading-bar"></div>
+
 <header>
     <div class="brand">
         <img src="https://www.cevalogistics.com/themes/custom/ceva/logo.svg" alt="CEVA Logistics" onerror="this.style.display='none'">
@@ -449,10 +482,16 @@
     <div class="empty-msg" id="activeEmpty" style="display:none;">No active pulls. Click "+ New Pull" to start one.</div>
 
     <div class="section-title">
-        QA Review <span class="count-badge" id="qaCount">0</span>
+        CEVA QA <span class="count-badge" id="cevaQaCount">0</span>
     </div>
-    <div class="card-grid" id="qaGrid"></div>
-    <div class="empty-msg" id="qaEmpty" style="display:none;">No pulls currently in QA.</div>
+    <div class="card-grid" id="cevaQaGrid"></div>
+    <div class="empty-msg" id="cevaQaEmpty" style="display:none;">No pulls currently in CEVA QA.</div>
+
+    <div class="section-title">
+        Lenovo QA <span class="count-badge" id="lenovoQaCount">0</span>
+    </div>
+    <div class="card-grid" id="lenovoQaGrid"></div>
+    <div class="empty-msg" id="lenovoQaEmpty" style="display:none;">No pulls currently in Lenovo QA.</div>
 </main>
 
 <!-- New Pull Modal -->
@@ -538,11 +577,13 @@
     // ── RENDER ──────────────────────────────────────────
     function render() {
         const activeGrid = document.getElementById('activeGrid');
-        const qaGrid = document.getElementById('qaGrid');
+        const cevaQaGrid = document.getElementById('cevaQaGrid');
+        const lenovoQaGrid = document.getElementById('lenovoQaGrid');
         activeGrid.innerHTML = '';
-        qaGrid.innerHTML = '';
+        cevaQaGrid.innerHTML = '';
+        lenovoQaGrid.innerHTML = '';
 
-        let activeCount = 0, qaCount = 0;
+        let activeCount = 0, cevaQaCount = 0, lenovoQaCount = 0;
 
         const ids = Object.keys(activePulls).sort();
 
@@ -551,16 +592,21 @@
             if (pull.status === 'PULLING') {
                 activeGrid.appendChild(buildPullCard(pull));
                 activeCount++;
-            } else if (pull.status === 'QA') {
-                qaGrid.appendChild(buildQACard(pull));
-                qaCount++;
+            } else if (pull.status === 'CEVA_QA') {
+                cevaQaGrid.appendChild(buildQACard(pull, 'CEVA QA', pull.cevaQaStartTime));
+                cevaQaCount++;
+            } else if (pull.status === 'LENOVO_QA') {
+                lenovoQaGrid.appendChild(buildQACard(pull, 'LENOVO QA', pull.lenovoQaStartTime));
+                lenovoQaCount++;
             }
         });
 
         document.getElementById('activeCount').textContent = activeCount;
-        document.getElementById('qaCount').textContent = qaCount;
+        document.getElementById('cevaQaCount').textContent = cevaQaCount;
+        document.getElementById('lenovoQaCount').textContent = lenovoQaCount;
         document.getElementById('activeEmpty').style.display = activeCount === 0 ? 'block' : 'none';
-        document.getElementById('qaEmpty').style.display = qaCount === 0 ? 'block' : 'none';
+        document.getElementById('cevaQaEmpty').style.display = cevaQaCount === 0 ? 'block' : 'none';
+        document.getElementById('lenovoQaEmpty').style.display = lenovoQaCount === 0 ? 'block' : 'none';
     }
 
     function buildPullCard(pull) {
@@ -606,23 +652,23 @@
         return card;
     }
 
-    function buildQACard(pull) {
+    function buildQACard(pull, stageLabel, stageStartTime) {
         const card = document.createElement('div');
         card.className = 'pull-card qa';
         card.dataset.pullId = pull.pullId;
         card.onclick = () => openActionModal(pull.pullId);
 
-        const elapsedSec = Math.floor((Date.now() - pull.qaStartTime) / 1000);
+        const elapsedSec = Math.floor((Date.now() - stageStartTime) / 1000);
 
         card.innerHTML = `
             <div class="card-top-row">
                 <div class="card-type-label">${pull.pullType} PULL</div>
-                <div class="sla-tag">IN QA</div>
+                <div class="sla-tag">${stageLabel}</div>
             </div>
             <div class="id-val">${escapeHtml(pull.pullId)}</div>
             <div class="card-footer">
                 <div class="timer-block">
-                    <div class="timer-label">QA Time Elapsed</div>
+                    <div class="timer-label">${stageLabel} Time Elapsed</div>
                     <div class="timer-val" data-elapsed>${formatDuration(elapsedSec)}</div>
                 </div>
             </div>
@@ -657,11 +703,19 @@
             }
         });
 
-        document.querySelectorAll('#qaGrid .pull-card').forEach(card => {
+        document.querySelectorAll('#cevaQaGrid .pull-card').forEach(card => {
             const id = card.dataset.pullId;
             const pull = activePulls[id];
             if (!pull) return;
-            const elapsedSec = Math.floor((Date.now() - pull.qaStartTime) / 1000);
+            const elapsedSec = Math.floor((Date.now() - pull.cevaQaStartTime) / 1000);
+            card.querySelector('[data-elapsed]').textContent = formatDuration(elapsedSec);
+        });
+
+        document.querySelectorAll('#lenovoQaGrid .pull-card').forEach(card => {
+            const id = card.dataset.pullId;
+            const pull = activePulls[id];
+            if (!pull) return;
+            const elapsedSec = Math.floor((Date.now() - pull.lenovoQaStartTime) / 1000);
             card.querySelector('[data-elapsed]').textContent = formatDuration(elapsedSec);
         });
     }
@@ -694,6 +748,32 @@
         return div.innerHTML;
     }
 
+    // ── LOADING BAR ─────────────────────────────────────
+    function showLoadingBar() {
+        const bar = document.getElementById('loading-bar');
+        bar.classList.remove('hidden', 'done');
+        // force reflow so the transition restarts
+        void bar.offsetWidth;
+        bar.classList.add('active');
+    }
+
+    function finishLoadingBar(success) {
+        const bar = document.getElementById('loading-bar');
+        bar.classList.remove('active');
+        if (success) {
+            bar.style.background = 'var(--red)';
+            bar.classList.add('done');
+        } else {
+            bar.style.background = '#888';
+            bar.classList.add('done');
+        }
+        setTimeout(() => {
+            bar.classList.add('hidden');
+            bar.classList.remove('done');
+            bar.style.background = '';
+        }, 500);
+    }
+
     // ── NEW PULL MODAL ──────────────────────────────────
     function openNewPullModal() {
         document.getElementById('pullIdInput').value = '';
@@ -722,6 +802,8 @@
         }
 
         const startTime = Date.now();
+        showLoadingBar();
+        let ok = false;
 
         try {
             const payload = { action: 'CREATE_PULL', pullId, pullType, startTime };
@@ -729,14 +811,15 @@
             const data = await r.json();
             if (data.error) {
                 alert(data.error);
-                return;
+            } else {
+                ok = true;
             }
         } catch (err) {
             alert('Failed to create pull. Check connection.');
             console.error(err);
-            return;
         }
 
+        finishLoadingBar(ok);
         closeNewPullModal();
         await fetchActive();
     }
@@ -751,8 +834,11 @@
 
         let metaHtml = `Type: ${pull.pullType} PULL<br>`;
         metaHtml += `Started: ${new Date(pull.startTime).toLocaleString()}<br>`;
-        if (pull.qaStartTime) {
-            metaHtml += `QA Started: ${new Date(pull.qaStartTime).toLocaleString()}<br>`;
+        if (pull.cevaQaStartTime) {
+            metaHtml += `CEVA QA Started: ${new Date(pull.cevaQaStartTime).toLocaleString()}<br>`;
+        }
+        if (pull.lenovoQaStartTime) {
+            metaHtml += `Lenovo QA Started: ${new Date(pull.lenovoQaStartTime).toLocaleString()}<br>`;
         }
         document.getElementById('actionModalMeta').innerHTML = metaHtml;
 
@@ -762,10 +848,16 @@
         if (pull.status === 'PULLING') {
             const btn = document.createElement('button');
             btn.className = 'btn btn-primary';
-            btn.textContent = 'Advance to QA';
-            btn.onclick = () => advanceToQA(pullId);
+            btn.textContent = 'Advance to CEVA QA';
+            btn.onclick = () => advanceToCevaQA(pullId);
             buttonsEl.appendChild(btn);
-        } else if (pull.status === 'QA') {
+        } else if (pull.status === 'CEVA_QA') {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-primary';
+            btn.textContent = 'Advance to Lenovo QA';
+            btn.onclick = () => advanceToLenovoQA(pullId);
+            buttonsEl.appendChild(btn);
+        } else if (pull.status === 'LENOVO_QA') {
             const btn = document.createElement('button');
             btn.className = 'btn btn-primary';
             btn.textContent = 'Pull Complete';
@@ -781,34 +873,56 @@
         selectedCardId = null;
     }
 
-    async function advanceToQA(pullId) {
+    async function advanceToCevaQA(pullId) {
         const qaStartTime = Date.now();
+        showLoadingBar();
+        let ok = false;
         try {
-            const payload = { action: 'ADVANCE_QA', pullId, qaStartTime };
+            const payload = { action: 'ADVANCE_CEVA_QA', pullId, qaStartTime };
             const r = await fetch(`${API}?payload=${encodeURIComponent(JSON.stringify(payload))}`);
             const data = await r.json();
-            if (data.error) { alert(data.error); return; }
+            if (data.error) { alert(data.error); } else { ok = true; }
         } catch (err) {
-            alert('Failed to advance to QA. Check connection.');
+            alert('Failed to advance to CEVA QA. Check connection.');
             console.error(err);
-            return;
         }
+        finishLoadingBar(ok);
+        closeActionModal();
+        await fetchActive();
+    }
+
+    async function advanceToLenovoQA(pullId) {
+        const qaStartTime = Date.now();
+        showLoadingBar();
+        let ok = false;
+        try {
+            const payload = { action: 'ADVANCE_LENOVO_QA', pullId, qaStartTime };
+            const r = await fetch(`${API}?payload=${encodeURIComponent(JSON.stringify(payload))}`);
+            const data = await r.json();
+            if (data.error) { alert(data.error); } else { ok = true; }
+        } catch (err) {
+            alert('Failed to advance to Lenovo QA. Check connection.');
+            console.error(err);
+        }
+        finishLoadingBar(ok);
         closeActionModal();
         await fetchActive();
     }
 
     async function completePull(pullId) {
         const completeTime = Date.now();
+        showLoadingBar();
+        let ok = false;
         try {
             const payload = { action: 'COMPLETE_PULL', pullId, completeTime };
             const r = await fetch(`${API}?payload=${encodeURIComponent(JSON.stringify(payload))}`);
             const data = await r.json();
-            if (data.error) { alert(data.error); return; }
+            if (data.error) { alert(data.error); } else { ok = true; }
         } catch (err) {
             alert('Failed to complete pull. Check connection.');
             console.error(err);
-            return;
         }
+        finishLoadingBar(ok);
         closeActionModal();
         await fetchActive();
     }
@@ -882,8 +996,13 @@
                 <div class="kpi-sub">vs 5:00:00 SLA</div>
             </div>
             <div class="kpi-block">
-                <div class="kpi-label">Avg QA Time</div>
-                <div class="kpi-val">${formatDuration(m.avgQASec)}</div>
+                <div class="kpi-label">Avg CEVA QA Time</div>
+                <div class="kpi-val">${formatDuration(m.avgCevaQaSec)}</div>
+                <div class="kpi-sub">across all completed pulls</div>
+            </div>
+            <div class="kpi-block">
+                <div class="kpi-label">Avg Lenovo QA Time</div>
+                <div class="kpi-val">${formatDuration(m.avgLenovoQaSec)}</div>
                 <div class="kpi-sub">across all completed pulls</div>
             </div>
         </div>`;
@@ -898,10 +1017,12 @@
                         <th>Type</th>
                         <th>SLA</th>
                         <th>Started</th>
-                        <th>QA Started</th>
+                        <th>CEVA QA Started</th>
+                        <th>Lenovo QA Started</th>
                         <th>Completed</th>
                         <th>Pull Time</th>
-                        <th>QA Time</th>
+                        <th>CEVA QA Time</th>
+                        <th>Lenovo QA Time</th>
                         <th>SLA Result</th>
                     </tr>
                 </thead>
@@ -910,7 +1031,7 @@
         const rows = [...m.completedPulls].sort((a, b) => new Date(b.completeTime) - new Date(a.completeTime));
 
         if (rows.length === 0) {
-            html += `<tr><td colspan="9" style="text-align:center; font-style:italic; color:#888;">No completed pulls in this range.</td></tr>`;
+            html += `<tr><td colspan="11" style="text-align:center; font-style:italic; color:#888;">No completed pulls in this range.</td></tr>`;
         } else {
             rows.forEach(p => {
                 html += `<tr>
@@ -918,10 +1039,12 @@
                     <td>${p.pullType}</td>
                     <td>${p.slaMinutes >= 60 ? (p.slaMinutes/60) + ' hr' : p.slaMinutes + ' min'}</td>
                     <td>${new Date(p.startTime).toLocaleString()}</td>
-                    <td>${p.qaStartTime ? new Date(p.qaStartTime).toLocaleString() : '-'}</td>
+                    <td>${p.cevaQaStartTime ? new Date(p.cevaQaStartTime).toLocaleString() : '-'}</td>
+                    <td>${p.lenovoQaStartTime ? new Date(p.lenovoQaStartTime).toLocaleString() : '-'}</td>
                     <td>${p.completeTime ? new Date(p.completeTime).toLocaleString() : '-'}</td>
                     <td>${formatDuration(p.pullDurationSec)}</td>
-                    <td>${p.qaDurationSec !== null && p.qaDurationSec !== '' ? formatDuration(p.qaDurationSec) : '-'}</td>
+                    <td>${p.cevaQaDurationSec !== null && p.cevaQaDurationSec !== '' ? formatDuration(p.cevaQaDurationSec) : '-'}</td>
+                    <td>${p.lenovoQaDurationSec !== null && p.lenovoQaDurationSec !== '' ? formatDuration(p.lenovoQaDurationSec) : '-'}</td>
                     <td><span class="pill ${p.metSLA ? 'pill-met' : 'pill-breach'}">${p.metSLA ? 'Met' : 'Breach'}</span></td>
                 </tr>`;
             });
