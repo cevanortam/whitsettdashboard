@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pallet Index Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root {
+    --navy: #00204E;
+    --navy2: #003057;
+    --red: #C8102E;
+    --bg: #f4f6f9;
+    --white: #ffffff;
+    --gray: #6b7280;
+    --border: #e2e6ec;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Barlow', sans-serif;
+    background: var(--bg);
+    color: var(--navy);
+  }
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  header h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  .btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: 0.15s ease;
+  }
+  .btn-red { background: var(--red); color: white; }
+  .btn-red:hover { background: #a80d24; }
+  .btn-navy { background: var(--navy2); color: white; }
+  .btn-navy:hover { background: #001f3d; }
+  .btn-gray { background: #d8dde5; color: var(--navy); }
+  .btn-gray:hover { background: #c4cad4; }
+  .btn-sm { padding: 6px 12px; font-size: 13px; }
+
+  main { padding: 20px 24px; max-width: 1300px; margin: 0 auto; }
+
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .toolbar input[type="text"] {
+    flex: 1;
+    min-width: 220px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+  }
+  .status {
+    font-size: 13px;
+    color: var(--gray);
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+  .pull-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .pull-card-header {
+    background: var(--navy);
+    color: white;
+    padding: 14px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pull-card-header h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    margin: 0;
+    font-weight: 700;
+  }
+  .pull-card-header .meta {
+    font-size: 12px;
+    color: #c9d6e8;
+    margin-top: 2px;
+  }
+  .chevron { transition: transform 0.2s; font-size: 18px; }
+  .pull-card.open .chevron { transform: rotate(180deg); }
+
+  .pull-card-body {
+    display: none;
+    padding: 14px 16px;
+  }
+  .pull-card.open .pull-card-body { display: block; }
+
+  .info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+  .info-row .item strong {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--gray);
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+  th, td {
+    border: 1px solid var(--border);
+    padding: 6px 8px;
+    text-align: left;
+  }
+  th {
+    background: #eef1f5;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--navy2);
+  }
+  .pallet-block {
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .pallet-title {
+    background: #eef1f5;
+    padding: 6px 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--navy2);
+  }
+  .card-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+  }
+
+  /* Modal */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 20px 24px;
+  }
+  .modal h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    color: var(--navy);
+    margin-top: 0;
+    border-bottom: 2px solid var(--red);
+    padding-bottom: 8px;
+  }
+  .form-group { margin-bottom: 12px; }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray);
+    margin-bottom: 4px;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 14px;
+  }
+  .form-row {
+    display: flex;
+    gap: 12px;
+  }
+  .form-row .form-group { flex: 1; }
+
+  .pallet-input-block {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #fafbfc;
+  }
+  .pallet-input-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .pallet-input-header h4 {
+    margin: 0;
+    font-family: 'Barlow Condensed', sans-serif;
+    color: var(--navy2);
+    font-size: 14px;
+  }
+  .sku-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+    align-items: center;
+  }
+  .sku-row input { flex: 1; }
+  .sku-row input.qty { flex: 0 0 90px; }
+  .remove-btn {
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    flex: 0 0 28px;
+  }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 16px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+  .add-pallet-btn {
+    background: var(--navy2);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  .empty-msg {
+    text-align: center;
+    color: var(--gray);
+    padding: 40px;
+    font-size: 14px;
+  }
+  .small-label {
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: -4px;
+    margin-bottom: 8px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .tab-btn {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    background: none;
+    border: none;
+    padding: 10px 18px;
+    cursor: pointer;
+    color: var(--gray);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+  }
+  .tab-btn.active {
+    color: var(--navy);
+    border-bottom-color: var(--red);
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Daily tracking */
+  .track-table-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow-x: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .track-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .track-table th, .track-table td {
+    border: 1px solid var(--border);
+    padding: 8px 10px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .track-table th {
+    background: var(--navy);
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  .track-table tr.discrepancy {
+    background: #fdecec;
+  }
+  .track-table tr.discrepancy td {
+    color: var(--red);
+    font-weight: 600;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Barlow Condensed', sans-serif;
+    text-transform: uppercase;
+  }
+  .badge-yes { background: #d4edda; color: #1e7e34; }
+  .badge-no { background: #f0f1f3; color: var(--gray); }
+  .badge-discrepancy {
+    background: var(--red);
+    color: white;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+  .wave-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .wave-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--navy2);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .wave-card.has-discrepancy {
+    border-left-color: var(--red);
+    background: #fff5f5;
+  }
+  .wave-card h4 {
+    margin: 0 0 4px 0;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px;
+    color: var(--navy);
+  }
+  .wave-card .count {
+    font-size: 26px;
+    font-weight: 700;
+    font-family: 'Barlow Condensed', sans-serif;
+    color: var(--navy2);
+  }
+  .wave-card .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--gray);
+    letter-spacing: 0.5px;
+  }
+  .wave-card.has-discrepancy .count { color: var(--red); }
+  .discrepancy-banner {
+    background: var(--red);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+  }
+  .checkbox-cell {
+    text-align: center;
+  }
+  .checkbox-cell input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+  .history-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 8px;
+    color: var(--navy2);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+  }
+  .history-row td {
+    background: #f7f9fb;
+    padding: 0;
+  }
+  .history-inner {
+    padding: 10px 16px;
+  }
+  .history-inner table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+  }
+  .history-inner th, .history-inner td {
+    border: 1px solid var(--border);
+    padding: 5px 8px;
+    text-align: left;
+  }
+  .history-inner th {
+    background: #eef1f5;
+    font-family: 'Barlow Condensed', sans-serif;
+    text-transform: uppercase;
+    font-size: 10px;
+    color: var(--navy2);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex; align-items:center; gap:16px;">
+    <img src="https://www.freelogovectors.net/wp-content/uploads/2022/07/ceva-logistics-logo-freelogovectors.net_.png" alt="CEVA Logistics" style="height:32px; filter: brightness(0) invert(1);">
+    <h1>Pallet Index Dashboard</h1>
+  </div>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="index">Pull ID Index</button>
+    <button class="tab-btn" data-tab="tracking">Daily Pull ID Tracking</button>
+    <button class="tab-btn" data-tab="archive">Released Archive</button>
+  </div>
+
+  <div class="tab-panel active" id="tab-index">
+  <div class="toolbar">
+    <button class="btn btn-red" id="addPullBtn">+ Add Pull ID</button>
+    <input type="text" id="searchInput" placeholder="Search by Pull ID or SKU...">
+    <span class="status" id="statusMsg">Connecting...</span>
+  </div>
+
+  <div class="card-grid" id="cardGrid">
+    <div class="empty-msg">Loading pull records...</div>
+  </div>
+  </div>
+
+  <div class="tab-panel" id="tab-tracking">
+    <div class="toolbar">
+      <button class="btn btn-red" id="addTrackBtn">+ Add Daily Entry</button>
+      <button class="btn btn-navy" id="exportTrackBtn">Export for Leadership</button>
+      <span class="status" id="trackStatusMsg">Connecting...</span>
+    </div>
+    <div id="discrepancyBanner"></div>
+    <div class="wave-summary" id="waveSummary"></div>
+    <div class="track-table-wrap">
+      <table class="track-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Date</th>
+            <th>Location ID</th>
+            <th>Pull ID</th>
+            <th>Pallet Count</th>
+            <th>Days in Location</th>
+            <th>CEVA QA'd</th>
+            <th>Lenovo QA'd</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="trackTableBody">
+          <tr><td colspan="9" class="empty-msg">Loading tracking records...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-archive">
+    <div class="toolbar">
+      <input type="text" id="archiveSearchInput" placeholder="Search released Pull IDs or Location IDs...">
+      <span class="status" id="archiveStatusMsg">Connecting...</span>
+    </div>
+    <div class="track-table-wrap">
+      <table class="track-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Location ID</th>
+            <th>Pull ID</th>
+            <th>Pallet Count</th>
+            <th>CEVA QA'd</th>
+            <th>Lenovo QA'd</th>
+            <th>Released Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="archiveTableBody">
+          <tr><td colspan="8" class="empty-msg">Loading archive...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- Password Modal -->
+<div class="overlay" id="passOverlay">
+  <div class="modal" style="max-width:380px;">
+    <h2>Enter Password</h2>
+    <div class="form-group">
+      <label>Password Required</label>
+      <input type="password" id="passInput" placeholder="Password">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" id="passCancel">Cancel</button>
+      <button class="btn btn-red" id="passConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pull Form Modal -->
+<div class="overlay" id="formOverlay">
+  <div class="modal">
+    <h2 id="formTitle">Add Pull ID</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Pull ID</label>
+        <input type="text" id="pullIdInput">
+      </div>
+      <div class="form-group">
+        <label>Number of Pallets</label>
+        <input type="number" id="palletCountInput" min="1" value="1">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Pull Date</label>
+        <input type="date" id="pullDateInput">
+      </div>
+      <div class="form-group">
+        <label>Verification Date</label>
+        <input type="date" id="verifyDateInput">
+      </div>
+    </div>
+
+    <div id="palletsContainer"></div>
+    <button class="add-pallet-btn" id="addPalletBtn" type="button">+ Add Pallet</button>
+
+    <div class="modal-actions">
+      <button class="btn btn-gray" id="formCancel">Cancel</button>
+      <button class="btn btn-red" id="formSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Daily Tracking Entry Modal -->
+<div class="overlay" id="trackFormOverlay">
+  <div class="modal" style="max-width:480px;">
+    <h2 id="trackFormTitle">Add Daily Entry</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="trackDateInput">
+      </div>
+      <div class="form-group">
+        <label>Location ID</label>
+        <input type="text" id="trackLocationInput">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Pull ID</label>
+        <input type="text" id="trackPullIdInput">
+      </div>
+      <div class="form-group">
+        <label>Physical Pallet Count</label>
+        <input type="number" id="trackPalletCountInput" min="0" value="0">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group" style="display:flex; align-items:center; gap:8px;">
+        <input type="checkbox" id="trackCevaQa" style="width:18px;height:18px;">
+        <label style="margin:0;">CEVA QA'd</label>
+      </div>
+      <div class="form-group" style="display:flex; align-items:center; gap:8px;">
+        <input type="checkbox" id="trackLenovoQa" style="width:18px;height:18px;">
+        <label style="margin:0;">Lenovo QA'd</label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-gray" id="trackFormCancel">Cancel</button>
+      <button class="btn btn-red" id="trackFormSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  databaseURL: "https://lenovo-indexing-default-rtdb.firebaseio.com/"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const pullsRef = ref(db, "pulls");
+const trackingRef = ref(db, "dailyTracking");
+const archiveRef = ref(db, "releasedArchive");
+
+const SITE_PASSWORD = "TeamCeva";
+let pullsData = {};
+let editingKey = null; // null = adding new, else editing existing key
+let pendingAction = null; // 'add' or {type:'edit', key} or {type:'delete', key}
+
+const cardGrid = document.getElementById("cardGrid");
+const statusMsg = document.getElementById("statusMsg");
+
+// ---------- Tabs ----------
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+  });
+});
+
+onValue(pullsRef, (snapshot) => {
+  pullsData = snapshot.val() || {};
+  statusMsg.textContent = "Connected — synced live";
+  renderCards();
+}, (err) => {
+  statusMsg.textContent = "Connection error: " + err.message;
+});
+
+function renderCards(filter = "") {
+  const keys = Object.keys(pullsData).sort((a,b) => {
+    const da = pullsData[a].pullDate || "";
+    const dbb = pullsData[b].pullDate || "";
+    return dbb.localeCompare(da);
+  });
+
+  if (keys.length === 0) {
+    cardGrid.innerHTML = '<div class="empty-msg">No pull records yet. Click "Add Pull ID" to get started.</div>';
+    return;
+  }
+
+  const f = filter.trim().toLowerCase();
+  let html = "";
+  let matchCount = 0;
+
+  keys.forEach(key => {
+    const pull = pullsData[key];
+    const pallets = pull.pallets || [];
+
+    let matches = !f;
+    if (f) {
+      if ((pull.pullId || "").toLowerCase().includes(f)) matches = true;
+      pallets.forEach(p => {
+        (p.skus || []).forEach(s => {
+          if ((s.sku || "").toLowerCase().includes(f)) matches = true;
+        });
+      });
+    }
+    if (!matches) return;
+    matchCount++;
+
+    let palletsHtml = "";
+    pallets.forEach((p, idx) => {
+      let rows = (p.skus || []).map(s =>
+        `<tr><td>${escapeHtml(s.sku)}</td><td>${s.qty !== "" && s.qty !== undefined && s.qty !== null ? escapeHtml(String(s.qty)) : "-"}</td></tr>`
+      ).join("");
+      if (!rows) rows = `<tr><td colspan="2" style="color:#9aa3af;">No SKUs entered</td></tr>`;
+      palletsHtml += `
+        <div class="pallet-block">
+          <div class="pallet-title">Pallet ${idx + 1}${p.label ? " — Notes: " + escapeHtml(p.label) : ""}</div>
+          <table>
+            <thead><tr><th>SKU</th><th>Qty</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    });
+
+    html += `
+      <div class="pull-card" data-key="${key}">
+        <div class="pull-card-header" onclick="window.toggleCard('${key}')">
+          <div>
+            <h3>${escapeHtml(pull.pullId || "Untitled Pull")}</h3>
+            <div class="meta">${pallets.length} pallet${pallets.length === 1 ? "" : "s"} • Pull: ${pull.pullDate || "—"} • Verified: ${pull.verifyDate || "—"}</div>
+          </div>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="pull-card-body">
+          <div class="info-row">
+            <div class="item"><strong>Pull ID</strong>${escapeHtml(pull.pullId || "—")}</div>
+            <div class="item"><strong>Pull Date</strong>${pull.pullDate || "—"}</div>
+            <div class="item"><strong>Verification Date</strong>${pull.verifyDate || "—"}</div>
+            <div class="item"><strong>Pallet Count</strong>${pallets.length}</div>
+          </div>
+          ${palletsHtml}
+          <div class="card-actions">
+            <button class="btn btn-navy btn-sm" onclick="window.editPull('${key}')">Edit</button>
+            <button class="btn btn-red btn-sm" onclick="window.deletePull('${key}')">Delete</button>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  cardGrid.innerHTML = html || '<div class="empty-msg">No matching records found.</div>';
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+window.toggleCard = function(key) {
+  const card = cardGrid.querySelector(`.pull-card[data-key="${key}"]`);
+  if (card) card.classList.toggle("open");
+};
+
+document.getElementById("searchInput").addEventListener("input", (e) => {
+  renderCards(e.target.value);
+});
+
+// ---------- Password Gate ----------
+const passOverlay = document.getElementById("passOverlay");
+const passInput = document.getElementById("passInput");
+
+document.getElementById("addPullBtn").addEventListener("click", () => {
+  pendingAction = "add";
+  openPasswordModal();
+});
+
+window.editPull = function(key) {
+  pendingAction = { type: "edit", key };
+  openPasswordModal();
+};
+
+window.deletePull = function(key) {
+  pendingAction = { type: "delete", key };
+  openPasswordModal();
+};
+
+function openPasswordModal() {
+  passInput.value = "";
+  passOverlay.classList.add("show");
+  setTimeout(() => passInput.focus(), 50);
+}
+
+document.getElementById("passCancel").addEventListener("click", () => {
+  passOverlay.classList.remove("show");
+  pendingAction = null;
+});
+
+document.getElementById("passConfirm").addEventListener("click", confirmPassword);
+passInput.addEventListener("keydown", (e) => { if (e.key === "Enter") confirmPassword(); });
+
+function confirmPassword() {
+  if (passInput.value !== SITE_PASSWORD) {
+    alert("Incorrect password.");
+    return;
+  }
+  passOverlay.classList.remove("show");
+
+  if (pendingAction === "add") {
+    openForm(null);
+  } else if (pendingAction && pendingAction.type === "edit") {
+    openForm(pendingAction.key);
+  } else if (pendingAction && pendingAction.type === "delete") {
+    if (confirm("Delete this Pull ID record? This cannot be undone.")) {
+      remove(ref(db, "pulls/" + pendingAction.key));
+    }
+  } else if (pendingAction === "track-add") {
+    openTrackForm(null);
+  } else if (pendingAction && pendingAction.type === "track-edit") {
+    openTrackForm(pendingAction.key);
+  } else if (pendingAction && pendingAction.type === "track-delete") {
+    if (confirm("Delete this tracking entry? This cannot be undone.")) {
+      remove(ref(db, "dailyTracking/" + pendingAction.key));
+    }
+  } else if (pendingAction && pendingAction.type === "track-release") {
+    if (confirm("Mark Pull ID \"" + pendingAction.pullId + "\" as Released to Lenovo? All entries for this Pull ID will be archived.")) {
+      releasePullId(pendingAction.pullId);
+    }
+  } else if (pendingAction && pendingAction.type === "archive-delete") {
+    if (confirm("Delete this archived entry? This cannot be undone.")) {
+      remove(ref(db, "releasedArchive/" + pendingAction.key));
+    }
+  }
+  pendingAction = null;
+}
+
+// ---------- Pull Form ----------
+const formOverlay = document.getElementById("formOverlay");
+const formTitle = document.getElementById("formTitle");
+const pullIdInput = document.getElementById("pullIdInput");
+const palletCountInput = document.getElementById("palletCountInput");
+const pullDateInput = document.getElementById("pullDateInput");
+const verifyDateInput = document.getElementById("verifyDateInput");
+const palletsContainer = document.getElementById("palletsContainer");
+
+document.getElementById("addPalletBtn").addEventListener("click", () => {
+  addPalletBlock();
+});
+
+function openForm(key) {
+  editingKey = key;
+  palletsContainer.innerHTML = "";
+
+  if (key) {
+    formTitle.textContent = "Edit Pull ID";
+    const pull = pullsData[key];
+    pullIdInput.value = pull.pullId || "";
+    pullDateInput.value = pull.pullDate || "";
+    verifyDateInput.value = pull.verifyDate || "";
+    const pallets = pull.pallets || [];
+    palletCountInput.value = pallets.length || 1;
+    if (pallets.length) {
+      pallets.forEach((p, idx) => addPalletBlock(p, idx));
+    } else {
+      addPalletBlock(null, 0);
+    }
+  } else {
+    formTitle.textContent = "Add Pull ID";
+    pullIdInput.value = "";
+    pullDateInput.value = "";
+    verifyDateInput.value = "";
+    palletCountInput.value = 1;
+    addPalletBlock(null, 0);
+  }
+
+  formOverlay.classList.add("show");
+}
+
+document.getElementById("formCancel").addEventListener("click", () => {
+  formOverlay.classList.remove("show");
+  editingKey = null;
+});
+
+palletCountInput.addEventListener("change", () => {
+  const target = Math.max(1, parseInt(palletCountInput.value) || 1);
+  const current = palletsContainer.children.length;
+  if (target > current) {
+    for (let i = current; i < target; i++) addPalletBlock(null, i);
+  } else if (target < current) {
+    for (let i = current - 1; i >= target; i--) {
+      palletsContainer.removeChild(palletsContainer.children[i]);
+    }
+  }
+  renumberPallets();
+});
+
+function addPalletBlock(palletData, index) {
+  const idx = index !== undefined ? index : palletsContainer.children.length;
+  const block = document.createElement("div");
+  block.className = "pallet-input-block";
+  block.innerHTML = `
+    <div class="pallet-input-header">
+      <h4>Pallet ${idx + 1}</h4>
+      <button type="button" class="remove-btn pallet-remove" title="Remove pallet">&times;</button>
+    </div>
+    <div class="sku-list"></div>
+    <button type="button" class="add-pallet-btn add-sku-btn" style="padding:6px 10px;font-size:12px;">+ Add SKU</button>
+    <div class="form-group" style="margin-top:8px; margin-bottom:0;">
+      <label>Pallet Notes (optional)</label>
+      <input type="text" class="pallet-label" placeholder="e.g. Front Row A1" value="${palletData && palletData.label ? escapeHtml(palletData.label) : ""}">
+    </div>
+  `;
+
+  const skuList = block.querySelector(".sku-list");
+  const skus = (palletData && palletData.skus && palletData.skus.length) ? palletData.skus : [{ sku: "", qty: "" }];
+  skus.forEach(s => addSkuRow(skuList, s));
+
+  block.querySelector(".add-sku-btn").addEventListener("click", () => addSkuRow(skuList, { sku: "", qty: "" }));
+  block.querySelector(".pallet-remove").addEventListener("click", () => {
+    if (palletsContainer.children.length > 1) {
+      block.remove();
+      palletCountInput.value = palletsContainer.children.length;
+      renumberPallets();
+    } else {
+      alert("At least one pallet is required.");
+    }
+  });
+
+  palletsContainer.appendChild(block);
+}
+
+function addSkuRow(skuList, data) {
+  const row = document.createElement("div");
+  row.className = "sku-row";
+  row.innerHTML = `
+    <input type="text" class="sku-name" placeholder="SKU" value="${data && data.sku ? escapeHtml(data.sku) : ""}">
+    <input type="text" class="sku-qty qty" placeholder="Qty (opt.)" value="${data && data.qty !== undefined && data.qty !== null ? escapeHtml(String(data.qty)) : ""}">
+    <button type="button" class="remove-btn sku-remove" title="Remove SKU">&times;</button>
+  `;
+  row.querySelector(".sku-remove").addEventListener("click", () => {
+    if (skuList.children.length > 1) {
+      row.remove();
+    } else {
+      row.querySelector(".sku-name").value = "";
+      row.querySelector(".sku-qty").value = "";
+    }
+  });
+  skuList.appendChild(row);
+}
+
+function renumberPallets() {
+  Array.from(palletsContainer.children).forEach((block, idx) => {
+    block.querySelector("h4").textContent = `Pallet ${idx + 1}`;
+  });
+}
+
+document.getElementById("formSave").addEventListener("click", () => {
+  const pullId = pullIdInput.value.trim();
+  if (!pullId) {
+    alert("Pull ID is required.");
+    return;
+  }
+
+  const pallets = [];
+  Array.from(palletsContainer.children).forEach(block => {
+    const label = block.querySelector(".pallet-label").value.trim();
+    const skus = [];
+    block.querySelectorAll(".sku-row").forEach(row => {
+      const sku = row.querySelector(".sku-name").value.trim();
+      const qtyRaw = row.querySelector(".sku-qty").value.trim();
+      if (sku) {
+        skus.push({ sku: sku, qty: qtyRaw === "" ? "" : qtyRaw });
+      }
+    });
+    pallets.push({ label: label, skus: skus });
+  });
+
+  const record = {
+    pullId: pullId,
+    pullDate: pullDateInput.value || "",
+    verifyDate: verifyDateInput.value || "",
+    palletCount: pallets.length,
+    pallets: pallets,
+    updatedAt: new Date().toISOString()
+  };
+
+  if (editingKey) {
+    set(ref(db, "pulls/" + editingKey), record);
+  } else {
+    record.createdAt = record.updatedAt;
+    push(pullsRef, record);
+  }
+
+  formOverlay.classList.remove("show");
+  editingKey = null;
+});
+
+// ========== DAILY PULL ID TRACKING ==========
+let trackingData = {};
+let archiveData = {};
+let trackEditingKey = null;
+
+const trackStatusMsg = document.getElementById("trackStatusMsg");
+const archiveStatusMsg = document.getElementById("archiveStatusMsg");
+const trackTableBody = document.getElementById("trackTableBody");
+const archiveTableBody = document.getElementById("archiveTableBody");
+const waveSummary = document.getElementById("waveSummary");
+const discrepancyBanner = document.getElementById("discrepancyBanner");
+
+onValue(trackingRef, (snapshot) => {
+  trackingData = snapshot.val() || {};
+  trackStatusMsg.textContent = "Connected — synced live";
+  renderTracking();
+}, (err) => {
+  trackStatusMsg.textContent = "Connection error: " + err.message;
+});
+
+onValue(archiveRef, (snapshot) => {
+  archiveData = snapshot.val() || {};
+  archiveStatusMsg.textContent = "Connected — synced live";
+  renderArchive();
+}, (err) => {
+  archiveStatusMsg.textContent = "Connection error: " + err.message;
+});
+
+// Group entries by Location ID + Pull ID, sorted history per group
+function getGroupedEntries() {
+  const groups = {};
+  Object.keys(trackingData).forEach(key => {
+    const entry = trackingData[key];
+    const groupKey = (entry.locationId || "").trim().toLowerCase() + "||" + (entry.pullId || "").trim().toLowerCase();
+    if (!groups[groupKey]) groups[groupKey] = [];
+    groups[groupKey].push({ key, ...entry });
+  });
+  // sort each group by date desc, then createdAt desc
+  Object.keys(groups).forEach(g => {
+    groups[g].sort((a, b) => {
+      const dateCmp = (b.date || "").localeCompare(a.date || "");
+      if (dateCmp !== 0) return dateCmp;
+      return (b.createdAt || "").localeCompare(a.createdAt || "");
+    });
+  });
+  return groups;
+}
+
+function renderTracking() {
+  const groups = getGroupedEntries();
+  const groupKeys = Object.keys(groups);
+
+  if (groupKeys.length === 0) {
+    trackTableBody.innerHTML = '<tr><td colspan="10" class="empty-msg">No daily tracking entries yet. Click "Add Daily Entry" to get started.</td></tr>';
+    waveSummary.innerHTML = "";
+    discrepancyBanner.innerHTML = "";
+    return;
+  }
+
+  // Sort groups by most recent entry date desc, then by Pull ID
+  groupKeys.sort((a, b) => {
+    const da = groups[a][0].date || "";
+    const dbb = groups[b][0].date || "";
+    const cmp = dbb.localeCompare(da);
+    if (cmp !== 0) return cmp;
+    return (groups[a][0].pullId || "").localeCompare(groups[b][0].pullId || "");
+  });
+
+  let html = "";
+  let totalDiscrepancies = 0;
+
+  // ---- Wave summary (by Pull ID) ----
+  const waveMap = {}; // pullId -> { count, hasDiscrepancy, locations }
+  groupKeys.forEach(gKey => {
+    const entries = groups[gKey];
+    const latest = entries[0];
+    const pullId = latest.pullId || "Unknown";
+    if (!waveMap[pullId]) waveMap[pullId] = { count: 0, hasDiscrepancy: false, locations: 0 };
+    waveMap[pullId].count += Number(latest.palletCount) || 0;
+    waveMap[pullId].locations += 1;
+
+    const isDiscrepant = entries.length > 1 &&
+      Number(entries[0].palletCount) !== Number(entries[1].palletCount);
+    if (isDiscrepant) {
+      waveMap[pullId].hasDiscrepancy = true;
+      totalDiscrepancies++;
+    }
+  });
+
+  let waveHtml = "";
+  let grandTotal = 0;
+  Object.keys(waveMap).sort().forEach(pullId => {
+    const w = waveMap[pullId];
+    grandTotal += w.count;
+    waveHtml += `
+      <div class="wave-card ${w.hasDiscrepancy ? "has-discrepancy" : ""}">
+        <div class="label">${w.locations} location${w.locations === 1 ? "" : "s"}</div>
+        <div class="count" style="font-size:30px;">${escapeHtml(pullId)}</div>
+        <div class="count">${w.count}</div>
+        <div class="label">Pallets Present${w.hasDiscrepancy ? " — ⚠ Discrepancy" : ""}</div>
+      </div>`;
+  });
+  waveHtml = `
+      <div class="wave-card" style="border-left-color: var(--navy);">
+        <div class="label">All Waves</div>
+        <div class="count" style="font-size:30px;">Total Pallet Count</div>
+        <div class="count">${grandTotal}</div>
+        <div class="label">Pallets Present</div>
+      </div>` + waveHtml;
+  waveSummary.innerHTML = waveHtml;
+
+  if (totalDiscrepancies > 0) {
+    discrepancyBanner.innerHTML = `<div class="discrepancy-banner">⚠ ${totalDiscrepancies} DISCREPANC${totalDiscrepancies === 1 ? "Y" : "IES"} DETECTED — Pallet count changed from the most recent prior entry. Review highlighted rows below.</div>`;
+  } else {
+    discrepancyBanner.innerHTML = "";
+  }
+
+  // ---- Table rows (latest entry per group, with expandable history) ----
+  groupKeys.forEach(gKey => {
+    const entries = groups[gKey];
+    const latest = entries[0];
+    const prior = entries[1];
+    const isDiscrepant = prior && Number(latest.palletCount) !== Number(prior.palletCount);
+
+    html += `
+      <tr class="${isDiscrepant ? "discrepancy" : ""}">
+        <td>${entries.length > 1 ? `<button class="history-toggle" onclick="window.toggleHistory('${gKey.replace(/'/g, "\\'")}')">History (${entries.length})</button>` : ""}</td>
+        <td>${latest.date || "—"}</td>
+        <td>${escapeHtml(latest.locationId || "—")}</td>
+        <td>${escapeHtml(latest.pullId || "—")}</td>
+        <td>${latest.palletCount !== undefined ? latest.palletCount : "—"} ${isDiscrepant ? `<span class="badge badge-discrepancy">Δ was ${prior.palletCount}</span>` : ""}</td>
+        <td>${daysInLocation(entries)}</td>
+        <td>${latest.cevaQa ? '<span class="badge badge-yes">Yes</span>' : '<span class="badge badge-no">No</span>'}</td>
+        <td>${latest.lenovoQa ? '<span class="badge badge-yes">Yes</span>' : '<span class="badge badge-no">No</span>'}</td>
+        <td>${isDiscrepant ? '<span class="badge badge-discrepancy">Discrepancy</span>' : '<span class="badge badge-yes">Ready</span>'}</td>
+        <td>
+          <button class="btn btn-navy btn-sm" onclick="window.editTrack('${latest.key}')">Edit</button>
+          <button class="btn btn-red btn-sm" onclick="window.deleteTrack('${latest.key}')">Delete</button>
+          <button class="btn btn-gray btn-sm" onclick="window.releaseTrack('${(latest.pullId || "").replace(/'/g, "\\'")}')">Release to Lenovo</button>
+        </td>
+      </tr>
+      <tr class="history-row" id="history-${cssSafe(gKey)}" style="display:none;">
+        <td colspan="10">
+          <div class="history-inner">
+            <table>
+              <thead><tr><th>Date</th><th>Pallet Count</th><th>CEVA QA'd</th><th>Lenovo QA'd</th><th>Discrepancy</th></tr></thead>
+              <tbody>
+                ${entries.map((e, i) => {
+                  const p = entries[i + 1];
+                  const disc = p && Number(e.palletCount) !== Number(p.palletCount);
+                  return `<tr ${disc ? 'style="color:var(--red);font-weight:600;"' : ""}>
+                    <td>${e.date || "—"}</td>
+                    <td>${e.palletCount !== undefined ? e.palletCount : "—"}${disc ? ` (was ${p.palletCount})` : ""}</td>
+                    <td>${e.cevaQa ? "Yes" : "No"}</td>
+                    <td>${e.lenovoQa ? "Yes" : "No"}</td>
+                    <td>${disc ? "⚠ Yes" : "—"}</td>
+                  </tr>`;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+        </td>
+      </tr>`;
+  });
+
+  trackTableBody.innerHTML = html;
+}
+
+function cssSafe(str) {
+  return str.replace(/[^a-zA-Z0-9]/g, "_");
+}
+
+// Days in location = inclusive day span from earliest reported date to latest reported date for the group
+function daysInLocation(entries) {
+  const dates = entries.map(e => e.date).filter(Boolean).sort();
+  if (dates.length === 0) return "—";
+  const earliest = new Date(dates[0] + "T00:00:00");
+  const latest = new Date(dates[dates.length - 1] + "T00:00:00");
+  const diffDays = Math.round((latest - earliest) / 86400000) + 1;
+  return diffDays;
+}
+
+window.toggleHistory = function(gKey) {
+  const row = document.getElementById("history-" + cssSafe(gKey));
+  if (row) row.style.display = row.style.display === "none" ? "table-row" : "none";
+};
+
+function renderArchive(filter = "") {
+  const keys = Object.keys(archiveData);
+  if (keys.length === 0) {
+    archiveTableBody.innerHTML = '<tr><td colspan="8" class="empty-msg">No released Pull IDs yet.</td></tr>';
+    return;
+  }
+
+  const f = filter.trim().toLowerCase();
+  let entries = [];
+  keys.forEach(key => {
+    const entry = archiveData[key];
+    if (!f || (entry.pullId || "").toLowerCase().includes(f) || (entry.locationId || "").toLowerCase().includes(f)) {
+      entries.push({ key, ...entry });
+    }
+  });
+
+  entries.sort((a, b) => (b.releasedAt || "").localeCompare(a.releasedAt || ""));
+
+  if (entries.length === 0) {
+    archiveTableBody.innerHTML = '<tr><td colspan="8" class="empty-msg">No matching archived records.</td></tr>';
+    return;
+  }
+
+  let html = "";
+  entries.forEach(e => {
+    html += `
+      <tr>
+        <td>${e.date || "—"}</td>
+        <td>${escapeHtml(e.locationId || "—")}</td>
+        <td>${escapeHtml(e.pullId || "—")}</td>
+        <td>${e.palletCount !== undefined ? e.palletCount : "—"}</td>
+        <td>${e.cevaQa ? '<span class="badge badge-yes">Yes</span>' : '<span class="badge badge-no">No</span>'}</td>
+        <td>${e.lenovoQa ? '<span class="badge badge-yes">Yes</span>' : '<span class="badge badge-no">No</span>'}</td>
+        <td>${e.releasedAt ? e.releasedAt.split("T")[0] : "—"}</td>
+        <td><button class="btn btn-red btn-sm" onclick="window.deleteArchive('${e.key}')">Delete</button></td>
+      </tr>`;
+  });
+  archiveTableBody.innerHTML = html;
+}
+
+window.deleteArchive = function(key) {
+  pendingAction = { type: "archive-delete", key };
+  openPasswordModal();
+};
+
+document.getElementById("archiveSearchInput").addEventListener("input", (e) => {
+  renderArchive(e.target.value);
+});
+
+// ---------- Daily Tracking Password-gated actions ----------
+document.getElementById("addTrackBtn").addEventListener("click", () => {
+  pendingAction = "track-add";
+  openPasswordModal();
+});
+
+window.editTrack = function(key) {
+  pendingAction = { type: "track-edit", key };
+  openPasswordModal();
+};
+
+window.deleteTrack = function(key) {
+  pendingAction = { type: "track-delete", key };
+  openPasswordModal();
+};
+
+window.releaseTrack = function(pullId) {
+  pendingAction = { type: "track-release", pullId };
+  openPasswordModal();
+};
+
+function releasePullId(pullId) {
+  const pullIdLower = pullId.trim().toLowerCase();
+  const now = new Date().toISOString();
+  Object.keys(trackingData).forEach(key => {
+    const entry = trackingData[key];
+    if ((entry.pullId || "").trim().toLowerCase() === pullIdLower) {
+      // Archive it
+      const archived = { ...entry, releasedAt: now };
+      push(archiveRef, archived);
+      // Remove from active tracking
+      remove(ref(db, "dailyTracking/" + key));
+    }
+  });
+}
+
+// ---------- Daily Tracking Form ----------
+const trackFormOverlay = document.getElementById("trackFormOverlay");
+const trackFormTitle = document.getElementById("trackFormTitle");
+const trackDateInput = document.getElementById("trackDateInput");
+const trackLocationInput = document.getElementById("trackLocationInput");
+const trackPullIdInput = document.getElementById("trackPullIdInput");
+const trackPalletCountInput = document.getElementById("trackPalletCountInput");
+const trackCevaQa = document.getElementById("trackCevaQa");
+const trackLenovoQa = document.getElementById("trackLenovoQa");
+
+function openTrackForm(key) {
+  trackEditingKey = key;
+  if (key) {
+    trackFormTitle.textContent = "Edit Daily Entry";
+    const entry = trackingData[key];
+    trackDateInput.value = entry.date || "";
+    trackLocationInput.value = entry.locationId || "";
+    trackPullIdInput.value = entry.pullId || "";
+    trackPalletCountInput.value = entry.palletCount !== undefined ? entry.palletCount : 0;
+    trackCevaQa.checked = !!entry.cevaQa;
+    trackLenovoQa.checked = !!entry.lenovoQa;
+  } else {
+    trackFormTitle.textContent = "Add Daily Entry";
+    const today = new Date().toISOString().split("T")[0];
+    trackDateInput.value = today;
+    trackLocationInput.value = "";
+    trackPullIdInput.value = "";
+    trackPalletCountInput.value = 0;
+    trackCevaQa.checked = false;
+    trackLenovoQa.checked = false;
+  }
+  trackFormOverlay.classList.add("show");
+}
+
+document.getElementById("trackFormCancel").addEventListener("click", () => {
+  trackFormOverlay.classList.remove("show");
+  trackEditingKey = null;
+});
+
+document.getElementById("trackFormSave").addEventListener("click", () => {
+  const locationId = trackLocationInput.value.trim();
+  const pullId = trackPullIdInput.value.trim();
+  if (!locationId || !pullId) {
+    alert("Location ID and Pull ID are required.");
+    return;
+  }
+
+  const record = {
+    date: trackDateInput.value || new Date().toISOString().split("T")[0],
+    locationId: locationId,
+    pullId: pullId,
+    palletCount: Number(trackPalletCountInput.value) || 0,
+    cevaQa: trackCevaQa.checked,
+    lenovoQa: trackLenovoQa.checked,
+    updatedAt: new Date().toISOString()
+  };
+
+  if (trackEditingKey) {
+    set(ref(db, "dailyTracking/" + trackEditingKey), { ...trackingData[trackEditingKey], ...record });
+  } else {
+    record.createdAt = record.updatedAt;
+    push(trackingRef, record);
+  }
+
+  trackFormOverlay.classList.remove("show");
+  trackEditingKey = null;
+});
+
+// ---------- Export for Leadership ----------
+document.getElementById("exportTrackBtn").addEventListener("click", () => {
+  const groups = getGroupedEntries();
+  const groupKeys = Object.keys(groups);
+
+  if (groupKeys.length === 0) {
+    alert("No tracking data to export.");
+    return;
+  }
+
+  groupKeys.sort((a, b) => {
+    const da = groups[a][0].date || "";
+    const dbb = groups[b][0].date || "";
+    const cmp = dbb.localeCompare(da);
+    if (cmp !== 0) return cmp;
+    return (groups[a][0].pullId || "").localeCompare(groups[b][0].pullId || "");
+  });
+
+  const wb = XLSX.utils.book_new();
+
+  // ---- Summary sheet ----
+  const waveMap = {};
+  let grandTotal = 0;
+  let totalDiscrepancies = 0;
+  groupKeys.forEach(gKey => {
+    const entries = groups[gKey];
+    const latest = entries[0];
+    const prior = entries[1];
+    const pullId = latest.pullId || "Unknown";
+    if (!waveMap[pullId]) waveMap[pullId] = { count: 0, locations: 0, discrepancies: 0 };
+    waveMap[pullId].count += Number(latest.palletCount) || 0;
+    waveMap[pullId].locations += 1;
+    if (prior && Number(latest.palletCount) !== Number(prior.palletCount)) {
+      waveMap[pullId].discrepancies += 1;
+      totalDiscrepancies += 1;
+    }
+    grandTotal += Number(latest.palletCount) || 0;
+  });
+
+  const summaryRows = [
+    ["Daily Pull ID Tracking — Summary"],
+    ["Generated", new Date().toLocaleString()],
+    [],
+    ["Total Pallet Count (All Waves)", grandTotal],
+    ["Total Active Discrepancies", totalDiscrepancies],
+    ["Total Pull IDs Tracked", groupKeys.length],
+    [],
+    ["Pull ID", "Locations", "Pallets Present", "Discrepancies"]
+  ];
+  Object.keys(waveMap).sort().forEach(pullId => {
+    const w = waveMap[pullId];
+    summaryRows.push([pullId, w.locations, w.count, w.discrepancies > 0 ? `⚠ ${w.discrepancies}` : "—"]);
+  });
+
+  const summarySheet = XLSX.utils.aoa_to_sheet(summaryRows);
+  summarySheet["!cols"] = [{ wch: 30 }, { wch: 16 }, { wch: 16 }, { wch: 14 }];
+  XLSX.utils.book_append_sheet(wb, summarySheet, "Summary");
+
+  // ---- Detail sheet ----
+  const detailRows = [
+    ["Location ID", "Pull ID", "Date", "Pallet Count", "Prior Count", "Discrepancy", "Days in Location", "CEVA QA'd", "Lenovo QA'd", "Status"]
+  ];
+  groupKeys.forEach(gKey => {
+    const entries = groups[gKey];
+    const latest = entries[0];
+    const prior = entries[1];
+    const isDiscrepant = prior && Number(latest.palletCount) !== Number(prior.palletCount);
+    detailRows.push([
+      latest.locationId || "",
+      latest.pullId || "",
+      latest.date || "",
+      latest.palletCount !== undefined ? latest.palletCount : "",
+      prior ? prior.palletCount : "",
+      isDiscrepant ? "YES" : "No",
+      daysInLocation(entries),
+      latest.cevaQa ? "Yes" : "No",
+      latest.lenovoQa ? "Yes" : "No",
+      isDiscrepant ? "Discrepancy" : "Ready"
+    ]);
+  });
+  const detailSheet = XLSX.utils.aoa_to_sheet(detailRows);
+  detailSheet["!cols"] = [
+    { wch: 16 }, { wch: 16 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 16 }, { wch: 12 }, { wch: 12 }, { wch: 14 }
+  ];
+  XLSX.utils.book_append_sheet(wb, detailSheet, "Current Status");
+
+  // ---- Full history sheet ----
+  const historyRows = [
+    ["Location ID", "Pull ID", "Date", "Pallet Count", "Discrepancy from Prior", "CEVA QA'd", "Lenovo QA'd", "Days in Location"]
+  ];
+  groupKeys.forEach(gKey => {
+    const entries = groups[gKey];
+    const groupDays = daysInLocation(entries);
+    entries.forEach((e, i) => {
+      const p = entries[i + 1];
+      const disc = p && Number(e.palletCount) !== Number(p.palletCount);
+      historyRows.push([
+        e.locationId || "",
+        e.pullId || "",
+        e.date || "",
+        e.palletCount !== undefined ? e.palletCount : "",
+        disc ? `YES (was ${p.palletCount})` : "—",
+        e.cevaQa ? "Yes" : "No",
+        e.lenovoQa ? "Yes" : "No",
+        groupDays
+      ]);
+    });
+  });
+  const historySheet = XLSX.utils.aoa_to_sheet(historyRows);
+  historySheet["!cols"] = [
+    { wch: 16 }, { wch: 16 }, { wch: 12 }, { wch: 14 }, { wch: 22 }, { wch: 12 }, { wch: 12 }, { wch: 16 }
+  ];
+  XLSX.utils.book_append_sheet(wb, historySheet, "Full History");
+
+  const today = new Date().toISOString().split("T")[0];
+  XLSX.writeFile(wb, `Pull_ID_Tracking_Report_${today}.xlsx`);
+});
+</script>
+
+
+</body>
+</html>
