@@ -156,7 +156,37 @@
         border: 1.5px dashed #ccc;
     }
 
-    /* ── CARD GRID ──────────────────────────────────────── */
+    /* ── TOP KPI STRIP ──────────────────────────────────── */
+    .top-kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 14px;
+        margin-bottom: 8px;
+    }
+
+    .top-kpi-block {
+        background: var(--primary);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 20px;
+        color: var(--text);
+    }
+
+    .top-kpi-block .kpi-label {
+        font-size: 11px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 1px; color: var(--muted); margin-bottom: 6px;
+    }
+
+    .top-kpi-block .kpi-val {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 32px; font-weight: 700; line-height: 1;
+    }
+
+    .top-kpi-block .kpi-sub {
+        font-size: 12px; color: var(--muted); margin-top: 4px;
+    }
+
+    body.tv-mode .top-kpi-block .kpi-val { font-size: 42px; }
     .card-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
@@ -487,6 +517,29 @@
 </header>
 
 <main>
+    <div class="top-kpi-grid" id="topKpiGrid">
+        <div class="top-kpi-block">
+            <div class="kpi-label">Pulls Completed Today</div>
+            <div class="kpi-val" id="kpiCompletedToday">--</div>
+            <div class="kpi-sub">Pull Complete confirmations</div>
+        </div>
+        <div class="top-kpi-block">
+            <div class="kpi-label">Avg Pull &rarr; CEVA QA</div>
+            <div class="kpi-val" id="kpiAvgPull">--</div>
+            <div class="kpi-sub">today's completed pulls</div>
+        </div>
+        <div class="top-kpi-block">
+            <div class="kpi-label">Avg CEVA QA &rarr; Lenovo QA</div>
+            <div class="kpi-val" id="kpiAvgCevaQa">--</div>
+            <div class="kpi-sub">today's completed pulls</div>
+        </div>
+        <div class="top-kpi-block">
+            <div class="kpi-label">Avg Lenovo QA &rarr; Complete</div>
+            <div class="kpi-val" id="kpiAvgLenovoQa">--</div>
+            <div class="kpi-sub">today's completed pulls</div>
+        </div>
+    </div>
+
     <div class="section-title">
         Active Pulls <span class="count-badge" id="activeCount">0</span>
     </div>
@@ -937,6 +990,7 @@
         finishLoadingBar(ok);
         closeActionModal();
         await fetchActive();
+        await fetchTodayKpis();
     }
 
     // ── METRICS ─────────────────────────────────────────
@@ -1074,6 +1128,29 @@
         try { localStorage.setItem('tvMode', enabled ? '1' : '0'); } catch (e) {}
     }
 
+    // ── TOP KPI STRIP ───────────────────────────────────
+    async function fetchTodayKpis() {
+        try {
+            const payload = { action: 'GET_METRICS', range: 'today' };
+            const r = await fetch(`${API}?payload=${encodeURIComponent(JSON.stringify(payload))}&t=${Date.now()}`);
+            const m = await r.json();
+            if (m.error) throw new Error(m.error);
+
+            const completed = m.completedPulls || [];
+            document.getElementById('kpiCompletedToday').textContent = completed.length;
+            document.getElementById('kpiAvgPull').textContent = formatDuration(avgCombined(completed.map(p => p.pullDurationSec)));
+            document.getElementById('kpiAvgCevaQa').textContent = formatDuration(m.avgCevaQaSec);
+            document.getElementById('kpiAvgLenovoQa').textContent = formatDuration(m.avgLenovoQaSec);
+        } catch (err) {
+            console.error('Fetch today KPIs failed:', err);
+        }
+    }
+
+    function avgCombined(arr) {
+        const valid = arr.filter(d => d !== '' && d !== null && d !== undefined);
+        return valid.length ? Math.round(valid.reduce((a, b) => a + b, 0) / valid.length) : 0;
+    }
+
     // ── INIT ────────────────────────────────────────────
     try {
         if (localStorage.getItem('tvMode') === '1') {
@@ -1083,7 +1160,9 @@
     } catch (e) {}
 
     fetchActive();
+    fetchTodayKpis();
     setInterval(fetchActive, 30000); // refresh from sheet every 30s
+    setInterval(fetchTodayKpis, 30000);
     setInterval(tick, 1000);          // update timers every second
 </script>
 
