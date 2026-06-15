@@ -419,6 +419,66 @@
     letter-spacing: 0.5px;
   }
   .wave-card.has-discrepancy .count { color: var(--red); }
+  .wave-card {
+    cursor: pointer;
+    transition: 0.15s ease;
+  }
+  .wave-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-left-width: 7px;
+  }
+  .wave-card.active-filter {
+    outline: 2px solid var(--navy2);
+    background: #eaf0fa;
+  }
+  .wave-card.has-discrepancy.active-filter {
+    outline: 2px solid var(--red);
+  }
+  .wave-card.all-waves-card:hover {
+    box-shadow: none;
+    border-left-width: 5px;
+    cursor: default;
+  }
+  #trackFilterBar {
+    margin-bottom: 12px;
+  }
+  .filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--navy);
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 6px 8px 6px 12px;
+    border-radius: 20px;
+  }
+  .filter-pill button {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    line-height: 1;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .filter-pill button:hover { background: rgba(255,255,255,0.35); }
+  .track-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 18px;
+  }
+  .track-table th.sortable:hover { color: var(--red); }
+  .track-table th.sortable .sort-arrow {
+    position: absolute;
+    right: 4px;
+    opacity: 0.35;
+  }
+  .track-table th.sortable.sort-active .sort-arrow { opacity: 1; }
   .discrepancy-banner {
     background: var(--red);
     color: white;
@@ -512,20 +572,21 @@
       <span class="status" id="trackStatusMsg">Connecting...</span>
     </div>
     <div id="discrepancyBanner"></div>
+    <div id="trackFilterBar"></div>
     <div class="wave-summary" id="waveSummary"></div>
     <div class="track-table-wrap">
       <table class="track-table">
         <thead>
           <tr>
             <th></th>
-            <th>Date</th>
-            <th>Location ID</th>
-            <th>Pull ID</th>
-            <th>Pallet Count</th>
-            <th>Days in Location</th>
-            <th>CEVA QA'd</th>
-            <th>Lenovo QA'd</th>
-            <th>Status</th>
+            <th class="sortable" data-sort="date">Date</th>
+            <th class="sortable" data-sort="locationId">Location ID</th>
+            <th class="sortable" data-sort="pullId">Pull ID</th>
+            <th class="sortable" data-sort="palletCount">Pallet Count</th>
+            <th class="sortable" data-sort="daysInLocation">Days in Location</th>
+            <th class="sortable" data-sort="cevaQa">CEVA QA'd</th>
+            <th class="sortable" data-sort="lenovoQa">Lenovo QA'd</th>
+            <th class="sortable" data-sort="status">Status</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -1018,6 +1079,9 @@ document.getElementById("formSave").addEventListener("click", () => {
 let trackingData = {};
 let archiveData = {};
 let trackEditingKey = null;
+let trackFilterPullId = null;
+let trackSortKey = null;
+let trackSortDir = "asc";
 
 const trackStatusMsg = document.getElementById("trackStatusMsg");
 const archiveStatusMsg = document.getElementById("archiveStatusMsg");
@@ -1025,6 +1089,7 @@ const trackTableBody = document.getElementById("trackTableBody");
 const archiveTableBody = document.getElementById("archiveTableBody");
 const waveSummary = document.getElementById("waveSummary");
 const discrepancyBanner = document.getElementById("discrepancyBanner");
+const trackFilterBar = document.getElementById("trackFilterBar");
 
 onValue(trackingRef, (snapshot) => {
   trackingData = snapshot.val() || {};
@@ -1096,7 +1161,7 @@ function renderTracking() {
     waveMap[pullId].locations += 1;
 
     const isDiscrepant = entries.length > 1 &&
-      Number(entries[0].palletCount) !== Number(entries[1].palletCount);
+      Number(entries[0].palletCount) < Number(entries[1].palletCount);
     if (isDiscrepant) {
       waveMap[pullId].hasDiscrepancy = true;
       totalDiscrepancies++;
@@ -1108,16 +1173,17 @@ function renderTracking() {
   Object.keys(waveMap).sort().forEach(pullId => {
     const w = waveMap[pullId];
     grandTotal += w.count;
+    const isActive = trackFilterPullId === pullId;
     waveHtml += `
-      <div class="wave-card ${w.hasDiscrepancy ? "has-discrepancy" : ""}">
+      <div class="wave-card ${w.hasDiscrepancy ? "has-discrepancy" : ""} ${isActive ? "active-filter" : ""}" data-pull-id="${escapeHtml(pullId).replace(/"/g, "&quot;")}" onclick="window.toggleTrackFilter(this.dataset.pullId)">
         <div class="label">${w.locations} location${w.locations === 1 ? "" : "s"}</div>
         <div class="count" style="font-size:30px;">${escapeHtml(pullId)}</div>
         <div class="count">${w.count}</div>
-        <div class="label">Pallets Present${w.hasDiscrepancy ? " — ⚠ Discrepancy" : ""}</div>
+        <div class="label">Pallets Present${w.hasDiscrepancy ? " — ⚠ Shortage" : ""}</div>
       </div>`;
   });
   waveHtml = `
-      <div class="wave-card" style="border-left-color: var(--navy);">
+      <div class="wave-card all-waves-card" style="border-left-color: var(--navy);">
         <div class="label">All Waves</div>
         <div class="count" style="font-size:30px;">Total Pallet Count</div>
         <div class="count">${grandTotal}</div>
@@ -1125,18 +1191,90 @@ function renderTracking() {
       </div>` + waveHtml;
   waveSummary.innerHTML = waveHtml;
 
+  // ---- Filter pill ----
+  if (trackFilterPullId) {
+    trackFilterBar.innerHTML = `<span class="filter-pill">Filtered: Pull ID ${escapeHtml(trackFilterPullId)} <button onclick="window.toggleTrackFilter('${trackFilterPullId.replace(/'/g, "\\'")}')">&times;</button></span>`;
+  } else {
+    trackFilterBar.innerHTML = "";
+  }
+
   if (totalDiscrepancies > 0) {
-    discrepancyBanner.innerHTML = `<div class="discrepancy-banner">⚠ ${totalDiscrepancies} DISCREPANC${totalDiscrepancies === 1 ? "Y" : "IES"} DETECTED — Pallet count changed from the most recent prior entry. Review highlighted rows below.</div>`;
+    discrepancyBanner.innerHTML = `<div class="discrepancy-banner">⚠ ${totalDiscrepancies} SHORTAGE${totalDiscrepancies === 1 ? "" : "S"} DETECTED — Pallet count decreased from the most recent prior entry. Review highlighted rows below.</div>`;
   } else {
     discrepancyBanner.innerHTML = "";
   }
 
+  // ---- Apply filter ----
+  let visibleKeys = trackFilterPullId
+    ? groupKeys.filter(gKey => (groups[gKey][0].pullId || "Unknown") === trackFilterPullId)
+    : groupKeys.slice();
+
+  // ---- Apply sort ----
+  if (trackSortKey) {
+    visibleKeys.sort((a, b) => {
+      const ea = groups[a][0];
+      const eb = groups[b][0];
+      let va, vb;
+      switch (trackSortKey) {
+        case "palletCount":
+          va = Number(ea.palletCount) || 0;
+          vb = Number(eb.palletCount) || 0;
+          break;
+        case "daysInLocation":
+          va = Number(daysInLocation(groups[a])) || 0;
+          vb = Number(daysInLocation(groups[b])) || 0;
+          break;
+        case "cevaQa":
+        case "lenovoQa":
+          va = ea[trackSortKey] ? 1 : 0;
+          vb = eb[trackSortKey] ? 1 : 0;
+          break;
+        case "status": {
+          const pa = groups[a][1];
+          const pb = groups[b][1];
+          va = (pa && Number(ea.palletCount) < Number(pa.palletCount)) ? 1 : 0;
+          vb = (pb && Number(eb.palletCount) < Number(pb.palletCount)) ? 1 : 0;
+          break;
+        }
+        default:
+          va = (ea[trackSortKey] || "").toString().toLowerCase();
+          vb = (eb[trackSortKey] || "").toString().toLowerCase();
+      }
+      let cmp;
+      if (typeof va === "number" && typeof vb === "number") {
+        cmp = va - vb;
+      } else {
+        cmp = va.localeCompare(vb);
+      }
+      return trackSortDir === "asc" ? cmp : -cmp;
+    });
+  }
+
+  // Update header sort indicators
+  document.querySelectorAll('.track-table th.sortable').forEach(th => {
+    th.classList.remove("sort-active");
+    const existing = th.querySelector(".sort-arrow");
+    if (existing) existing.remove();
+    if (th.dataset.sort === trackSortKey) {
+      th.classList.add("sort-active");
+      const arrow = document.createElement("span");
+      arrow.className = "sort-arrow";
+      arrow.textContent = trackSortDir === "asc" ? "▲" : "▼";
+      th.appendChild(arrow);
+    }
+  });
+
+  if (visibleKeys.length === 0) {
+    trackTableBody.innerHTML = '<tr><td colspan="10" class="empty-msg">No tracking entries match the current filter.</td></tr>';
+    return;
+  }
+
   // ---- Table rows (latest entry per group, with expandable history) ----
-  groupKeys.forEach(gKey => {
+  visibleKeys.forEach(gKey => {
     const entries = groups[gKey];
     const latest = entries[0];
     const prior = entries[1];
-    const isDiscrepant = prior && Number(latest.palletCount) !== Number(prior.palletCount);
+    const isDiscrepant = prior && Number(latest.palletCount) < Number(prior.palletCount);
 
     html += `
       <tr class="${isDiscrepant ? "discrepancy" : ""}">
@@ -1144,11 +1282,11 @@ function renderTracking() {
         <td>${latest.date || "—"}</td>
         <td>${escapeHtml(latest.locationId || "—")}</td>
         <td>${escapeHtml(latest.pullId || "—")}</td>
-        <td>${latest.palletCount !== undefined ? latest.palletCount : "—"} ${isDiscrepant ? `<span class="badge badge-discrepancy">Δ was ${prior.palletCount}</span>` : ""}</td>
+        <td>${latest.palletCount !== undefined ? latest.palletCount : "—"} ${isDiscrepant ? `<span class="badge badge-discrepancy">▼ Shortage, was ${prior.palletCount}</span>` : ""}</td>
         <td>${daysInLocation(entries)}</td>
         <td>${latest.cevaQa ? '<span class="badge badge-yes">Yes</span>' : '<span class="badge badge-no">No</span>'}</td>
         <td>${latest.lenovoQa ? '<span class="badge badge-yes">Yes</span>' : '<span class="badge badge-no">No</span>'}</td>
-        <td>${isDiscrepant ? '<span class="badge badge-discrepancy">Discrepancy</span>' : '<span class="badge badge-yes">Ready</span>'}</td>
+        <td>${isDiscrepant ? '<span class="badge badge-discrepancy">Shortage</span>' : '<span class="badge badge-yes">Ready</span>'}</td>
         <td>
           <button class="btn btn-navy btn-sm" onclick="window.editTrack('${latest.key}')">Edit</button>
           <button class="btn btn-red btn-sm" onclick="window.deleteTrack('${latest.key}')">Delete</button>
@@ -1159,11 +1297,11 @@ function renderTracking() {
         <td colspan="10">
           <div class="history-inner">
             <table>
-              <thead><tr><th>Date</th><th>Pallet Count</th><th>CEVA QA'd</th><th>Lenovo QA'd</th><th>Discrepancy</th></tr></thead>
+              <thead><tr><th>Date</th><th>Pallet Count</th><th>CEVA QA'd</th><th>Lenovo QA'd</th><th>Shortage</th></tr></thead>
               <tbody>
                 ${entries.map((e, i) => {
                   const p = entries[i + 1];
-                  const disc = p && Number(e.palletCount) !== Number(p.palletCount);
+                  const disc = p && Number(e.palletCount) < Number(p.palletCount);
                   return `<tr ${disc ? 'style="color:var(--red);font-weight:600;"' : ""}>
                     <td>${e.date || "—"}</td>
                     <td>${e.palletCount !== undefined ? e.palletCount : "—"}${disc ? ` (was ${p.palletCount})` : ""}</td>
@@ -1200,6 +1338,24 @@ window.toggleHistory = function(gKey) {
   const row = document.getElementById("history-" + cssSafe(gKey));
   if (row) row.style.display = row.style.display === "none" ? "table-row" : "none";
 };
+
+window.toggleTrackFilter = function(pullId) {
+  trackFilterPullId = (trackFilterPullId === pullId) ? null : pullId;
+  renderTracking();
+};
+
+document.querySelectorAll('.track-table th.sortable').forEach(th => {
+  th.addEventListener("click", () => {
+    const key = th.dataset.sort;
+    if (trackSortKey === key) {
+      trackSortDir = trackSortDir === "asc" ? "desc" : "asc";
+    } else {
+      trackSortKey = key;
+      trackSortDir = "asc";
+    }
+    renderTracking();
+  });
+});
 
 function renderArchive(filter = "") {
   const keys = Object.keys(archiveData);
@@ -1386,7 +1542,7 @@ document.getElementById("exportTrackBtn").addEventListener("click", () => {
     if (!waveMap[pullId]) waveMap[pullId] = { count: 0, locations: 0, discrepancies: 0 };
     waveMap[pullId].count += Number(latest.palletCount) || 0;
     waveMap[pullId].locations += 1;
-    if (prior && Number(latest.palletCount) !== Number(prior.palletCount)) {
+    if (prior && Number(latest.palletCount) < Number(prior.palletCount)) {
       waveMap[pullId].discrepancies += 1;
       totalDiscrepancies += 1;
     }
@@ -1398,10 +1554,10 @@ document.getElementById("exportTrackBtn").addEventListener("click", () => {
     ["Generated", new Date().toLocaleString()],
     [],
     ["Total Pallet Count (All Waves)", grandTotal],
-    ["Total Active Discrepancies", totalDiscrepancies],
+    ["Total Active Shortages", totalDiscrepancies],
     ["Total Pull IDs Tracked", groupKeys.length],
     [],
-    ["Pull ID", "Locations", "Pallets Present", "Discrepancies"]
+    ["Pull ID", "Locations", "Pallets Present", "Shortages"]
   ];
   Object.keys(waveMap).sort().forEach(pullId => {
     const w = waveMap[pullId];
@@ -1414,13 +1570,13 @@ document.getElementById("exportTrackBtn").addEventListener("click", () => {
 
   // ---- Detail sheet ----
   const detailRows = [
-    ["Location ID", "Pull ID", "Date", "Pallet Count", "Prior Count", "Discrepancy", "Days in Location", "CEVA QA'd", "Lenovo QA'd", "Status"]
+    ["Location ID", "Pull ID", "Date", "Pallet Count", "Prior Count", "Shortage", "Days in Location", "CEVA QA'd", "Lenovo QA'd", "Status"]
   ];
   groupKeys.forEach(gKey => {
     const entries = groups[gKey];
     const latest = entries[0];
     const prior = entries[1];
-    const isDiscrepant = prior && Number(latest.palletCount) !== Number(prior.palletCount);
+    const isDiscrepant = prior && Number(latest.palletCount) < Number(prior.palletCount);
     detailRows.push([
       latest.locationId || "",
       latest.pullId || "",
@@ -1431,7 +1587,7 @@ document.getElementById("exportTrackBtn").addEventListener("click", () => {
       daysInLocation(entries),
       latest.cevaQa ? "Yes" : "No",
       latest.lenovoQa ? "Yes" : "No",
-      isDiscrepant ? "Discrepancy" : "Ready"
+      isDiscrepant ? "Shortage" : "Ready"
     ]);
   });
   const detailSheet = XLSX.utils.aoa_to_sheet(detailRows);
@@ -1442,14 +1598,14 @@ document.getElementById("exportTrackBtn").addEventListener("click", () => {
 
   // ---- Full history sheet ----
   const historyRows = [
-    ["Location ID", "Pull ID", "Date", "Pallet Count", "Discrepancy from Prior", "CEVA QA'd", "Lenovo QA'd", "Days in Location"]
+    ["Location ID", "Pull ID", "Date", "Pallet Count", "Shortage from Prior", "CEVA QA'd", "Lenovo QA'd", "Days in Location"]
   ];
   groupKeys.forEach(gKey => {
     const entries = groups[gKey];
     const groupDays = daysInLocation(entries);
     entries.forEach((e, i) => {
       const p = entries[i + 1];
-      const disc = p && Number(e.palletCount) !== Number(p.palletCount);
+      const disc = p && Number(e.palletCount) < Number(p.palletCount);
       historyRows.push([
         e.locationId || "",
         e.pullId || "",
