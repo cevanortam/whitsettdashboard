@@ -178,6 +178,46 @@
     display: flex;
     gap: 8px;
   }
+  .btn-amber { background: #b45309; color: white; }
+  .btn-amber:hover { background: #92400e; }
+
+  .archived-section {
+    margin-top: 24px;
+    border-top: 2px solid var(--border);
+    padding-top: 20px;
+  }
+  .archived-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .archived-section-header h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0;
+  }
+  .pull-card.archived-card .pull-card-header {
+    background: #4b5563;
+  }
+  .archived-badge {
+    display: inline-block;
+    background: #b45309;
+    color: white;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
 
   /* Modal */
   .overlay {
@@ -557,11 +597,22 @@
   <div class="toolbar">
     <button class="btn btn-red" id="addPullBtn">+ Add Pull ID</button>
     <input type="text" id="searchInput" placeholder="Search by Pull ID or SKU...">
+    <button class="btn btn-gray" id="toggleArchivedBtn">Show Archived</button>
     <span class="status" id="statusMsg">Connecting...</span>
   </div>
 
   <div class="card-grid" id="cardGrid">
     <div class="empty-msg">Loading pull records...</div>
+  </div>
+
+  <div class="archived-section" id="archivedSection" style="display:none;">
+    <div class="archived-section-header">
+      <h3>Archived Pull IDs</h3>
+      <input type="text" id="archivePullSearchInput" placeholder="Search archived Pull IDs or SKUs..." style="flex:1; min-width:220px; max-width:360px; padding:8px 12px; border:1px solid var(--border); border-radius:6px; font-family:'Barlow',sans-serif; font-size:14px;">
+    </div>
+    <div class="card-grid" id="archivedCardGrid">
+      <div class="empty-msg">No archived Pull IDs.</div>
+    </div>
   </div>
   </div>
 
@@ -726,11 +777,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const pullsRef = ref(db, "pulls");
+const pullIndexArchiveRef = ref(db, "pullIndexArchive");
 const trackingRef = ref(db, "dailyTracking");
 const archiveRef = ref(db, "releasedArchive");
 
 const SITE_PASSWORD = "TeamCeva";
 let pullsData = {};
+let pullIndexArchiveData = {};
+let showingArchived = false;
 let editingKey = null; // null = adding new, else editing existing key
 let pendingAction = null; // 'add' or {type:'edit', key} or {type:'delete', key}
 
@@ -753,6 +807,25 @@ onValue(pullsRef, (snapshot) => {
   renderCards();
 }, (err) => {
   statusMsg.textContent = "Connection error: " + err.message;
+});
+
+onValue(pullIndexArchiveRef, (snapshot) => {
+  pullIndexArchiveData = snapshot.val() || {};
+  renderArchivedCards();
+});
+
+// ---------- Toggle Archived Section ----------
+const toggleArchivedBtn = document.getElementById("toggleArchivedBtn");
+const archivedSection = document.getElementById("archivedSection");
+toggleArchivedBtn.addEventListener("click", () => {
+  showingArchived = !showingArchived;
+  archivedSection.style.display = showingArchived ? "block" : "none";
+  toggleArchivedBtn.textContent = showingArchived ? "Hide Archived" : "Show Archived";
+  if (showingArchived) renderArchivedCards();
+});
+
+document.getElementById("archivePullSearchInput").addEventListener("input", (e) => {
+  renderArchivedCards(e.target.value);
 });
 
 function renderCards(filter = "") {
@@ -822,6 +895,7 @@ function renderCards(filter = "") {
           ${palletsHtml}
           <div class="card-actions">
             <button class="btn btn-navy btn-sm" onclick="window.editPull('${key}')">Edit</button>
+            <button class="btn btn-amber btn-sm" onclick="window.archivePull('${key}')">Archive</button>
             <button class="btn btn-red btn-sm" onclick="window.deletePull('${key}')">Delete</button>
           </div>
         </div>
@@ -830,6 +904,102 @@ function renderCards(filter = "") {
 
   cardGrid.innerHTML = html || '<div class="empty-msg">No matching records found.</div>';
 }
+
+function renderArchivedCards(filter = "") {
+  const archivedCardGrid = document.getElementById("archivedCardGrid");
+  const keys = Object.keys(pullIndexArchiveData).sort((a, b) => {
+    const da = pullIndexArchiveData[a].archivedAt || "";
+    const dbb = pullIndexArchiveData[b].archivedAt || "";
+    return dbb.localeCompare(da);
+  });
+
+  if (keys.length === 0) {
+    archivedCardGrid.innerHTML = '<div class="empty-msg">No archived Pull IDs.</div>';
+    return;
+  }
+
+  const f = filter.trim().toLowerCase();
+  let html = "";
+  let matchCount = 0;
+
+  keys.forEach(key => {
+    const pull = pullIndexArchiveData[key];
+    const pallets = pull.pallets || [];
+
+    let matches = !f;
+    if (f) {
+      if ((pull.pullId || "").toLowerCase().includes(f)) matches = true;
+      pallets.forEach(p => {
+        (p.skus || []).forEach(s => {
+          if ((s.sku || "").toLowerCase().includes(f)) matches = true;
+        });
+      });
+    }
+    if (!matches) return;
+    matchCount++;
+
+    let palletsHtml = "";
+    pallets.forEach((p, idx) => {
+      let rows = (p.skus || []).map(s =>
+        `<tr><td>${escapeHtml(s.sku)}</td><td>${s.qty !== "" && s.qty !== undefined && s.qty !== null ? escapeHtml(String(s.qty)) : "-"}</td></tr>`
+      ).join("");
+      if (!rows) rows = `<tr><td colspan="2" style="color:#9aa3af;">No SKUs entered</td></tr>`;
+      palletsHtml += `
+        <div class="pallet-block">
+          <div class="pallet-title">Pallet ${idx + 1}${p.label ? " — Notes: " + escapeHtml(p.label) : ""}</div>
+          <table>
+            <thead><tr><th>SKU</th><th>Qty</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    });
+
+    const archivedDate = pull.archivedAt ? pull.archivedAt.split("T")[0] : "—";
+
+    html += `
+      <div class="pull-card archived-card" data-key="${key}">
+        <div class="pull-card-header" onclick="window.toggleArchivedCard('${key}')">
+          <div>
+            <h3>${escapeHtml(pull.pullId || "Untitled Pull")}<span class="archived-badge">Archived</span></h3>
+            <div class="meta">${pallets.length} pallet${pallets.length === 1 ? "" : "s"} • Pull: ${pull.pullDate || "—"} • Archived: ${archivedDate}</div>
+          </div>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="pull-card-body">
+          <div class="info-row">
+            <div class="item"><strong>Pull ID</strong>${escapeHtml(pull.pullId || "—")}</div>
+            <div class="item"><strong>Pull Date</strong>${pull.pullDate || "—"}</div>
+            <div class="item"><strong>Verification Date</strong>${pull.verifyDate || "—"}</div>
+            <div class="item"><strong>Pallet Count</strong>${pallets.length}</div>
+            <div class="item"><strong>Archived On</strong>${archivedDate}</div>
+          </div>
+          ${palletsHtml}
+          <div class="card-actions">
+            <button class="btn btn-navy btn-sm" onclick="window.restorePull('${key}')">Restore</button>
+            <button class="btn btn-red btn-sm" onclick="window.deleteArchivedPull('${key}')">Delete</button>
+          </div>
+        </div>
+      </div>`;
+  });
+
+  archivedCardGrid.innerHTML = html || '<div class="empty-msg">No matching archived records.</div>';
+}
+
+window.toggleArchivedCard = function(key) {
+  const grid = document.getElementById("archivedCardGrid");
+  const card = grid.querySelector(`.pull-card[data-key="${key}"]`);
+  if (card) card.classList.toggle("open");
+};
+
+window.restorePull = function(key) {
+  pendingAction = { type: "restore-pull", key };
+  openPasswordModal();
+};
+
+window.deleteArchivedPull = function(key) {
+  pendingAction = { type: "delete-archived-pull", key };
+  openPasswordModal();
+};
 
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, c => ({
@@ -857,6 +1027,11 @@ document.getElementById("addPullBtn").addEventListener("click", () => {
 
 window.editPull = function(key) {
   pendingAction = { type: "edit", key };
+  openPasswordModal();
+};
+
+window.archivePull = function(key) {
+  pendingAction = { type: "archive-pull", key };
   openPasswordModal();
 };
 
@@ -893,6 +1068,23 @@ function confirmPassword() {
   } else if (pendingAction && pendingAction.type === "delete") {
     if (confirm("Delete this Pull ID record? This cannot be undone.")) {
       remove(ref(db, "pulls/" + pendingAction.key));
+    }
+  } else if (pendingAction && pendingAction.type === "archive-pull") {
+    if (confirm(`Archive Pull ID "${pullsData[pendingAction.key]?.pullId || pendingAction.key}"? It will be moved to the Archived Pull IDs section and can be restored later.`)) {
+      const record = { ...pullsData[pendingAction.key], archivedAt: new Date().toISOString() };
+      set(ref(db, "pullIndexArchive/" + pendingAction.key), record);
+      remove(ref(db, "pulls/" + pendingAction.key));
+    }
+  } else if (pendingAction && pendingAction.type === "restore-pull") {
+    if (confirm(`Restore Pull ID "${pullIndexArchiveData[pendingAction.key]?.pullId || pendingAction.key}" back to the active index?`)) {
+      const record = { ...pullIndexArchiveData[pendingAction.key] };
+      delete record.archivedAt;
+      set(ref(db, "pulls/" + pendingAction.key), record);
+      remove(ref(db, "pullIndexArchive/" + pendingAction.key));
+    }
+  } else if (pendingAction && pendingAction.type === "delete-archived-pull") {
+    if (confirm("Permanently delete this archived Pull ID? This cannot be undone.")) {
+      remove(ref(db, "pullIndexArchive/" + pendingAction.key));
     }
   } else if (pendingAction === "track-add") {
     openTrackForm(null);
